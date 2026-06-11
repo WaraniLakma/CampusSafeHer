@@ -1,8 +1,8 @@
-\# CampusSafeHer
+# CampusSafeHer
 
 
 
-\## Problem Statement
+## Problem Statement
 
 
 
@@ -10,7 +10,7 @@ Female university students may face safety concerns when traveling alone, return
 
 
 
-\## Solution Overview
+## Solution Overview
 
 
 
@@ -18,69 +18,69 @@ CampusSafeHer is a full-stack web application designed to improve student safety
 
 
 
-\## Technologies Used
+## Technologies Used
 
 
 
-\### Frontend
+### Frontend
 
 
 
-\* React
+* React
 
-\* Vite
+* Vite
 
-\* CSS / Tailwind CSS (Planned)
-
-
-
-\### Backend
+* CSS / Tailwind CSS (Planned)
 
 
 
-\* Node.js
-
-\* Express.js
+### Backend
 
 
 
-\### Database
+* Node.js
+
+* Express.js
 
 
 
-\* MongoDB
+### Database
 
 
 
-\### AI Integration
+* MongoDB
 
 
 
-\* Google Gemini API
+### AI Integration
 
 
 
-\### Version Control
+* Google Gemini API
 
 
 
-\* Git
-
-\* GitHub
+### Version Control
 
 
 
-\### Deployment
+* Git
+
+* GitHub
 
 
 
-\* Vercel (Frontend)
-
-\* Render (Backend)
+### Deployment
 
 
 
-\## Architectural Diagram
+* Vercel (Frontend)
+
+* Render (Backend)
+
+
+
+## Architectural Diagram
 
 
 
@@ -88,29 +88,29 @@ Architecture diagram will be added after backend and database integration.
 
 
 
-\## Key Features
+## Key Features
 
 
 
-\* User Authentication
+* User Authentication
 
-\* Emergency SOS Alerts
+* Emergency SOS Alerts
 
-\* Trusted Contact Management
+* Trusted Contact Management
 
-\* Incident Reporting
+* Incident Reporting
 
-\* AI Safety Assistant
+* AI Safety Assistant
 
-\* Admin Dashboard
+* Admin Dashboard
 
-\* Safety Analytics
+* Safety Analytics
 
-\* Responsive Design
+* Responsive Design
 
 
 
-\## Deployment URL
+## Deployment URL
 
 
 
