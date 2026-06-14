@@ -9,6 +9,7 @@ const healthRoutes = require("./routes/healthRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const sosRoutes = require("./routes/sosRoutes");
 const incidentRoutes = require("./routes/incidentRoutes");
+const checkInRoutes = require("./routes/checkInRoutes");
 
 
 const app = express();
@@ -23,7 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/sos", sosRoutes);
 app.use("/api/incidents", incidentRoutes);
-
+app.use("/api/checkins", checkInRoutes);
 
 const PORT = process.env.PORT || 5000;
 
