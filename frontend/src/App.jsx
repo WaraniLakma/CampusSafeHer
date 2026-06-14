@@ -3,6 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Contacts from "./pages/Contacts";
+import Incidents from "./pages/Incidents";
+import CheckIn from "./pages/CheckIn";
+import AIChat from "./pages/AIChat";
+import SOS from "./pages/SOS";
 
 function App() {
   return (
@@ -11,6 +16,11 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/contacts" element={<Contacts />} />
+        <Route path="/incidents" element={<Incidents />} />
+        <Route path="/checkins" element={<CheckIn />} />
+        <Route path="/ai" element={<AIChat />} />
+        <Route path="/sos" element={<SOS />} />
       </Routes>
     </BrowserRouter>
   );
