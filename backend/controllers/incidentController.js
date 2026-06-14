@@ -1,7 +1,11 @@
 const Incident = require("../models/Incident");
 
 // Create Incident Report
-const createIncident = async (req, res) => {
+const createIncident = async (e) => {
+  e.preventDefault();
+
+
+  console.log("Button clicked");  
   try {
     const {
       category,
