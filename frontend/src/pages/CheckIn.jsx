@@ -54,6 +54,26 @@ function CheckIn() {
     }
   };
 
+  const completeCheckIn = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.patch(
+        `/checkins/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchCheckIns();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>Safety Check-In</h1>
@@ -86,12 +106,31 @@ function CheckIn() {
       {checkIns.map((checkIn) => (
         <div key={checkIn._id}>
           <h3>Destination: {checkIn.destination}</h3>
+
           <p>
             Expected Arrival:{" "}
-            {new Date(checkIn.expectedArrivalTime).toLocaleString()}
+            {new Date(
+              checkIn.expectedArrivalTime
+            ).toLocaleString()}
           </p>
+
           <p>Status: {checkIn.status}</p>
-          <p>Checked In: {checkIn.checkedIn ? "Yes" : "No"}</p>
+
+          <p>
+            Checked In:{" "}
+            {checkIn.checkedIn ? "Yes" : "No"}
+          </p>
+
+          {!checkIn.checkedIn && (
+            <button
+              onClick={() =>
+                completeCheckIn(checkIn._id)
+              }
+            >
+              Complete Check-In
+            </button>
+          )}
+
           <hr />
         </div>
       ))}
