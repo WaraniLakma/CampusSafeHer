@@ -124,6 +124,11 @@ function Incidents() {
 
           <p>Location: {incident.location}</p>
 
+          <p>
+                Reported On:{" "}
+                {new Date(incident.createdAt).toLocaleString()}
+          </p>
+
           <p>Status: {incident.status}</p>
 
           <p>
