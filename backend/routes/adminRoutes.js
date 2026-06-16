@@ -6,6 +6,7 @@ const { adminOnly } = require("../middleware/adminMiddleware");
 
 const {
   getAllIncidents,
+  updateIncidentStatus,
 } = require("../controllers/incidentController");
 
 router.get(
@@ -13,6 +14,13 @@ router.get(
   protect,
   adminOnly,
   getAllIncidents
+);
+
+router.patch(
+  "/incidents/:id",
+  protect,
+  adminOnly,
+  updateIncidentStatus
 );
 
 module.exports = router;

@@ -64,9 +64,44 @@ const getAllIncidents = async (req, res) => {
     });
   }
 };
+// Admin - Update Incident Status
+const updateIncidentStatus = async (req, res) => {
+  try {
+
+
+    console.log("Status:", req.body.status);
+    console.log("ID:", req.params.id);
+
+    const { status } = req.body;
+
+    const incident = await Incident.findById(
+      req.params.id
+    );
+
+    if (!incident) {
+      return res.status(404).json({
+        message: "Incident not found",
+      });
+    }
+
+    incident.status = status;
+
+    await incident.save();
+
+    res.status(200).json({
+      message: "Status updated successfully",
+      incident,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   createIncident,
   getMyIncidents,
   getAllIncidents,
+  updateIncidentStatus,
 };
