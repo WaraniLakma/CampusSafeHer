@@ -17,6 +17,12 @@ const checkInSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    reminderInterval: {
+        type: Number,
+        default: 10,
+        min: 1,
+        max: 60,
+    },
 
     checkedIn: {
       type: Boolean,
@@ -25,7 +31,27 @@ const checkInSchema = new mongoose.Schema(
 
     status: {
       type: String,
+      enum: ["Active", "Reminder Sent", "Overdue", "Alert Sent", "Completed"],
       default: "Active",
+    },
+
+    reminder10Sent: {
+      type: Boolean,
+      default: false,
+    },
+
+    reminder20Sent: {
+      type: Boolean,
+      default: false,
+    },
+
+    alertSent: {
+      type: Boolean,
+      default: false,
+    },
+
+    alertMessage: {
+      type: String,
     },
   },
   {

@@ -12,11 +12,13 @@ const incidentRoutes = require("./routes/incidentRoutes");
 const checkInRoutes = require("./routes/checkInRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const startCheckInMonitor = require("./services/checkInMonitor");
 
 
 const app = express();
 
 connectDB();
+startCheckInMonitor();
 
 app.use(cors());
 app.use(express.json());

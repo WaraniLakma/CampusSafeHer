@@ -6,12 +6,14 @@ const createCheckIn = async (req, res) => {
     const {
       destination,
       expectedArrivalTime,
+      reminderInterval,
     } = req.body;
 
     const checkIn = await CheckIn.create({
       user: req.user.id,
       destination,
       expectedArrivalTime,
+      reminderInterval,
     });
 
     res.status(201).json({
