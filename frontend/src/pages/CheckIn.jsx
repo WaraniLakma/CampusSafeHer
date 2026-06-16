@@ -5,6 +5,8 @@ function CheckIn() {
   const [checkIns, setCheckIns] = useState([]);
   const [destination, setDestination] = useState("");
   const [expectedArrivalTime, setExpectedArrivalTime] = useState("");
+  const [reminderInterval, setReminderInterval] =
+  useState(10);
 
   useEffect(() => {
     fetchCheckIns();
@@ -37,6 +39,7 @@ function CheckIn() {
         {
           destination,
           expectedArrivalTime,
+          reminderInterval,
         },
         {
           headers: {
@@ -96,6 +99,22 @@ function CheckIn() {
         />
 
         <br />
+        <br />
+        <input
+            type="number"
+            min="1"
+            max="60"
+            value={reminderInterval}
+            onChange={(e) =>
+                setReminderInterval(Number(e.target.value))
+            }
+        />
+
+        <p>
+            Reminder Interval:
+            {reminderInterval} minute(s)
+        </p>
+
         <br />
 
         <button type="submit">Create Check-In</button>
