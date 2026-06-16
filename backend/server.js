@@ -11,6 +11,7 @@ const sosRoutes = require("./routes/sosRoutes");
 const incidentRoutes = require("./routes/incidentRoutes");
 const checkInRoutes = require("./routes/checkInRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/sos", sosRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/checkins", checkInRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

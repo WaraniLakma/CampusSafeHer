@@ -49,8 +49,24 @@ const getMyIncidents = async (req, res) => {
     });
   }
 };
+// Admin - Get All Incidents
+const getAllIncidents = async (req, res) => {
+  try {
+    const incidents = await Incident.find()
+      .populate("user", "name email");
+
+    res.status(200).json({
+      incidents,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   createIncident,
   getMyIncidents,
+  getAllIncidents,
 };
