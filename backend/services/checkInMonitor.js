@@ -31,7 +31,7 @@ const startCheckInMonitor = () => {
         // 1st Reminder
         if (minutesLate >= interval && !checkIn.reminder10Sent) {
           checkIn.reminder10Sent = true;
-          checkIn.status = "Reminder Sent";
+          checkIn.status = "First Reminder Sent";
 
           console.log(`1st reminder for ${checkIn.destination}`);
         }
@@ -39,7 +39,7 @@ const startCheckInMonitor = () => {
         // 2nd Reminder
         if (minutesLate >= interval * 2 && !checkIn.reminder20Sent) {
           checkIn.reminder20Sent = true;
-          checkIn.status = "Reminder Sent";
+          checkIn.status = "Second Reminder Sent";
 
           console.log(`2nd reminder for ${checkIn.destination}`);
         }

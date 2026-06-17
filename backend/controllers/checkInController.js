@@ -39,7 +39,7 @@ const completeCheckIn = async (req, res) => {
     }
 
     checkIn.checkedIn = true;
-    checkIn.status = "Completed";
+    checkIn.status = "Safe Confirmed";
 
     await checkIn.save();
 

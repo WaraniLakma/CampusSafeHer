@@ -31,7 +31,7 @@ const checkInSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Active", "Reminder Sent", "Overdue", "Alert Sent", "Completed"],
+      enum: ["Active", "First Reminder Sent","Second Reminder Sent", "Overdue", "Alert Sent", "Safe Confirmed"],
       default: "Active",
     },
 
