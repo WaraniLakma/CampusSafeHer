@@ -70,9 +70,33 @@ const getMyCheckIns = async (req, res) => {
     });
   }
 };
+const deleteCheckIn = async (req, res) => {
+  try {
+    const checkIn = await CheckIn.findById(
+      req.params.id
+    );
+
+    if (!checkIn) {
+      return res.status(404).json({
+        message: "Check-In not found",
+      });
+    }
+
+    await checkIn.deleteOne();
+
+    res.status(200).json({
+      message: "Check-In deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   createCheckIn,
   completeCheckIn,
   getMyCheckIns,
+  deleteCheckIn,
 };
