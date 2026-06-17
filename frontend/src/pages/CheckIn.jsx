@@ -149,7 +149,29 @@ function CheckIn() {
       console.log(error);
     }
   };
+  const deleteCheckIn = async (id) => {
+        try {
+            const token = localStorage.getItem("token");
 
+            await API.delete(
+            `/checkins/${id}`,
+            {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            }
+            );
+
+            fetchCheckIns();
+
+            showNotification(
+            "🗑 Check-In Deleted",
+            "Check-In removed successfully."
+            );
+        } catch (error) {
+            console.log(error);
+        }
+  };
   return (
     <div style={{ padding: "20px" }}>
       <h1>Safety Check-In</h1>
@@ -294,6 +316,14 @@ function CheckIn() {
               Complete Check-In
             </button>
           )}
+          <button
+            style={{ marginLeft: "10px" }}
+            onClick={() =>
+                deleteCheckIn(checkIn._id)
+            }
+            >
+            🗑 Delete
+          </button>
 
           <hr />
         </div>
