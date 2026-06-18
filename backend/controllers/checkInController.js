@@ -7,6 +7,8 @@ const createCheckIn = async (req, res) => {
       destination,
       expectedArrivalTime,
       reminderInterval,
+      currentLatitude,
+      currentLongitude,
     } = req.body;
 
     const checkIn = await CheckIn.create({
@@ -14,6 +16,13 @@ const createCheckIn = async (req, res) => {
       destination,
       expectedArrivalTime,
       reminderInterval,
+      currentLatitude,
+      currentLongitude,
+
+      lastKnownLatitude: currentLatitude,
+      lastKnownLongitude: currentLongitude,
+
+
     });
 
     res.status(201).json({
@@ -93,10 +102,47 @@ const deleteCheckIn = async (req, res) => {
     });
   }
 };
+const updateLocation = async (req, res) => {
+  try {
+    const {
+      lastKnownLatitude,
+      lastKnownLongitude,
+    } = req.body;
+
+    const checkIn =
+      await CheckIn.findById(
+        req.params.id
+      );
+
+    if (!checkIn) {
+      return res.status(404).json({
+        message: "Check-In not found",
+      });
+    }
+
+    checkIn.lastKnownLatitude =
+      lastKnownLatitude;
+
+    checkIn.lastKnownLongitude =
+      lastKnownLongitude;
+
+    await checkIn.save();
+
+    res.status(200).json({
+      message:
+        "Location updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   createCheckIn,
   completeCheckIn,
   getMyCheckIns,
   deleteCheckIn,
+  updateLocation,
 };

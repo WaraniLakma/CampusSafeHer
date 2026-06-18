@@ -12,6 +12,20 @@ const checkInSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    currentLatitude: {
+        type: Number,
+    },
+
+    currentLongitude: {
+        type: Number,
+    },
+    lastKnownLatitude: {
+        type: Number,
+    },
+
+    lastKnownLongitude: {
+        type: Number,
+    },
 
     expectedArrivalTime: {
       type: Date,
