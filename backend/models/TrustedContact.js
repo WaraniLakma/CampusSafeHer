@@ -8,13 +8,9 @@ const trustedContactSchema = new mongoose.Schema(
       required: true,
     },
 
-    name: {
-      type: String,
-      required: true,
-    },
-
-    phone: {
-      type: String,
+    trustedUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
 
@@ -28,4 +24,7 @@ const trustedContactSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("TrustedContact", trustedContactSchema);
+module.exports = mongoose.model(
+  "TrustedContact",
+  trustedContactSchema
+);
