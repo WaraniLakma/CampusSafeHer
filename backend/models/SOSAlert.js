@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const sosAlertSchema = new mongoose.Schema(
+const sosSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -8,22 +8,19 @@ const sosAlertSchema = new mongoose.Schema(
       required: true,
     },
 
-    message: {
-      type: String,
-      default: "Emergency SOS Alert",
-    },
-
     latitude: {
       type: Number,
+      required: true,
     },
 
     longitude: {
       type: Number,
+      required: true,
     },
 
     status: {
       type: String,
-      default: "active",
+      default: "Active",
     },
   },
   {
@@ -31,4 +28,7 @@ const sosAlertSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("SOSAlert", sosAlertSchema);
+module.exports = mongoose.model(
+  "SOS",
+  sosSchema
+);

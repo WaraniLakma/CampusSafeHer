@@ -1,14 +1,21 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
-  createSOSAlert,
-  getMySOSAlerts,
+  protect,
+} = require(
+  "../middleware/authMiddleware"
+);
+
+const {
+  createSOS,
 } = require("../controllers/sosController");
 
-const { protect } = require("../middleware/authMiddleware");
-
-router.post("/", protect, createSOSAlert);
-router.get("/", protect, getMySOSAlerts);
+router.post(
+  "/",
+  protect,
+  createSOS
+);
 
 module.exports = router;

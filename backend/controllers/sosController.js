@@ -1,36 +1,21 @@
-const SOSAlert = require("../models/SOSAlert");
+const SOS = require("../models/SOSAlert");
 
-// Create SOS Alert
-const createSOSAlert = async (req, res) => {
+const createSOS = async (req, res) => {
   try {
-    const { latitude, longitude } = req.body;
+    const {
+      latitude,
+      longitude,
+    } = req.body;
 
-    const sosAlert = await SOSAlert.create({
+    const sos = await SOS.create({
       user: req.user.id,
       latitude,
       longitude,
     });
 
     res.status(201).json({
-      message: "SOS Alert Created Successfully",
-      sosAlert,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-// Get My SOS Alerts
-const getMySOSAlerts = async (req, res) => {
-  try {
-    const alerts = await SOSAlert.find({
-      user: req.user.id,
-    });
-
-    res.status(200).json({
-      alerts,
+      message: "SOS Alert Sent",
+      sos,
     });
   } catch (error) {
     res.status(500).json({
@@ -40,6 +25,5 @@ const getMySOSAlerts = async (req, res) => {
 };
 
 module.exports = {
-  createSOSAlert,
-  getMySOSAlerts,
+  createSOS,
 };

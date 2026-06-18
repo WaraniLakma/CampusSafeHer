@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 
+
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
@@ -31,6 +32,7 @@ app.use("/api/incidents", incidentRoutes);
 app.use("/api/checkins", checkInRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/admin", adminRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 
