@@ -4,9 +4,9 @@ import API from "../services/api";
 function Contacts() {
   const [contacts, setContacts] = useState([]);
 
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [relationship, setRelationship] = useState("");
+  const [email, setEmail] = useState("");
+  const [relationship, setRelationship] =
+    useState("");
 
   useEffect(() => {
     fetchContacts();
@@ -37,8 +37,7 @@ function Contacts() {
       await API.post(
         "/contacts",
         {
-          name,
-          phone,
+          email,
           relationship,
         },
         {
@@ -48,8 +47,7 @@ function Contacts() {
         }
       );
 
-      setName("");
-      setPhone("");
+      setEmail("");
       setRelationship("");
 
       fetchContacts();
@@ -64,20 +62,12 @@ function Contacts() {
 
       <form onSubmit={addContact}>
         <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <br />
-        <br />
-
-        <input
-          type="text"
-          placeholder="Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          type="email"
+          placeholder="Trusted Contact Email"
+          value={email}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
         />
 
         <br />
@@ -87,7 +77,9 @@ function Contacts() {
           type="text"
           placeholder="Relationship"
           value={relationship}
-          onChange={(e) => setRelationship(e.target.value)}
+          onChange={(e) =>
+            setRelationship(e.target.value)
+          }
         />
 
         <br />
@@ -102,9 +94,16 @@ function Contacts() {
 
       {contacts.map((contact) => (
         <div key={contact._id}>
-          <h3>{contact.name}</h3>
-          <p>Phone: {contact.phone}</p>
-          <p>Relationship: {contact.relationship}</p>
+          <h3>
+            {contact.email ||
+              "Email not available"}
+          </h3>
+
+          <p>
+            Relationship:{" "}
+            {contact.relationship}
+          </p>
+
           <hr />
         </div>
       ))}
