@@ -5,6 +5,17 @@ const User = require("../models/User");
 const addTrustedContact = async (req, res) => {
   try {
     const { email, relationship } = req.body;
+    const currentUser =
+  await User.findById(req.user.id);
+
+    if (
+    currentUser.email === email
+    ) {
+    return res.status(400).json({
+        message:
+        "You cannot add yourself as a trusted contact",
+    });
+    }
 
     const trustedUser = await User.findOne({
       email,
@@ -69,8 +80,38 @@ const getTrustedContacts = async (req, res) => {
     });
   }
 };
+const deleteTrustedContact = async (
+  req,
+  res
+) => {
+  try {
+    const contact =
+      await TrustedContact.findById(
+        req.params.id
+      );
+
+    if (!contact) {
+      return res.status(404).json({
+        message:
+          "Trusted contact not found",
+      });
+    }
+
+    await contact.deleteOne();
+
+    res.status(200).json({
+      message:
+        "Trusted contact deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   addTrustedContact,
   getTrustedContacts,
+  deleteTrustedContact,
 };
