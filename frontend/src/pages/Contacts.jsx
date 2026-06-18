@@ -46,16 +46,46 @@ function Contacts() {
           },
         }
       );
+      alert(
+        "Trusted contact added successfully"
+      );
 
       setEmail("");
       setRelationship("");
 
       fetchContacts();
     } catch (error) {
-      console.log(error);
+        alert(
+            error.response?.data?.message ||
+            "Failed to add trusted contact"
+        );
+
+        console.log(error);
     }
   };
+  const deleteContact = async (id) => {
+    try {
+        const token =
+        localStorage.getItem("token");
 
+        await API.delete(
+        `/contacts/${id}`,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${token}`,
+            },
+        }
+        );
+        alert(
+        "Trusted contact deleted successfully"
+        );
+
+        fetchContacts();
+    } catch (error) {
+        console.log(error);
+    }
+  };
   return (
     <div style={{ padding: "20px" }}>
       <h1>Trusted Contacts</h1>
@@ -95,16 +125,26 @@ function Contacts() {
       {contacts.map((contact) => (
         <div key={contact._id}>
           <h3>
-            {contact.email ||
-              "Email not available"}
+            {contact.trustedUser?.name}
           </h3>
 
           <p>
-            Relationship:{" "}
-            {contact.relationship}
+            Email: {contact.trustedUser?.email}
           </p>
 
-          <hr />
+           <p>
+            Relationship: {contact.relationship}
+            </p>
+
+            <button
+            onClick={() =>
+                deleteContact(contact._id)
+            }
+            >
+            🗑 Delete
+            </button>
+
+            <hr />
         </div>
       ))}
     </div>
