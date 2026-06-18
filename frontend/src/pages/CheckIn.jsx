@@ -6,21 +6,61 @@ function CheckIn() {
   const [destination, setDestination] = useState("");
   const [expectedArrivalTime, setExpectedArrivalTime] = useState("");
   const [reminderInterval, setReminderInterval] = useState(10);
-  const [showAlertBanner, setShowAlertBanner] =
-  useState(false);
+  const [showAlertBanner, setShowAlertBanner] =useState(false);
+  const [currentLatitude, setCurrentLatitude] =useState(null);
+  const [currentLongitude, setCurrentLongitude] =useState(null);
 
   useEffect(() => {
-    if ("Notification" in window) {
-      Notification.requestPermission();
-    }
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
 
-    fetchCheckIns();
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+            console.log(
+                "Latitude:",
+                position.coords.latitude
+            );
 
-    const interval = setInterval(() => {
-      fetchCheckIns();
-    }, 5000);
+            console.log(
+                "Longitude:",
+                position.coords.longitude
+            );
 
-    return () => clearInterval(interval);
+            setCurrentLatitude(
+                position.coords.latitude
+            );
+
+            setCurrentLongitude(
+                position.coords.longitude
+            );
+            },
+            (error) => {
+            console.log(error);
+            }
+        );
+
+        fetchCheckIns();
+
+        const interval = setInterval(() => {
+            fetchCheckIns();
+        }, 5000);
+
+        const locationInterval = setInterval(() => {
+            checkIns.forEach((checkIn) => {
+            if (
+                !checkIn.checkedIn &&
+                checkIn.status !== "Alert Sent"
+            ) {
+                updateLocation(checkIn._id);
+            }
+            });
+        }, 30000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(locationInterval);
+        };
   }, []);
 
   const showNotification = (title, body) => {
@@ -52,7 +92,6 @@ function CheckIn() {
           showNotification(
             "🟡 CampusSafeHer 1st Reminder",
             "Your expected arrival time has passed.",
-            "Please complete your safety check-in if you have arrived safely."
           );
 
           localStorage.setItem(notificationKey, "shown");
@@ -69,8 +108,9 @@ function CheckIn() {
         if (checkIn.status === "Overdue") {
           showNotification(
             "🟠 CampusSafeHer Last Reminder",
-            "After 5 minutes, your trusted contacts will be notified.",
-            "Please confirm your safety immediately."
+            "Please confirm your safety immediately.",
+            "After 5 minutes, your trusted contacts will be notified.", 
+            
           );
 
           localStorage.setItem(notificationKey, "shown");
@@ -96,6 +136,36 @@ function CheckIn() {
       console.log(error);
     }
   };
+  const updateLocation = async (
+    checkInId
+    ) => {
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+        try {
+            const token =
+            localStorage.getItem("token");
+
+            await API.patch(
+            `/checkins/location/${checkInId}`,
+            {
+                lastKnownLatitude:
+                position.coords.latitude,
+
+                lastKnownLongitude:
+                position.coords.longitude,
+            },
+            {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            }
+            );
+        } catch (error) {
+            console.log(error);
+        }
+        }
+    );
+  };
 
   const createCheckIn = async (e) => {
     e.preventDefault();
@@ -109,6 +179,8 @@ function CheckIn() {
           destination,
           expectedArrivalTime,
           reminderInterval,
+          currentLatitude,
+          currentLongitude
         },
         {
           headers: {
@@ -269,31 +341,60 @@ function CheckIn() {
             {new Date(checkIn.expectedArrivalTime).toLocaleString()}
           </p>
 
-          <p>Status: {checkIn.status}</p>
+          
 
-          {checkIn.status === "First Reminder Sent" && (
+          {checkIn.status === "Active" && (
             <p>
-              🟡 Reminder: You have not completed your safety check-in.
+              Status: 🟢 Active: Awaiting expected arrival time.
             </p>
           )}
 
-          {checkIn.status === "Overdue" && (
+          {checkIn.status === "First Reminder Sent" && (
+            <div>
             <p>
-              🟠 Last Reminder: After 5 minutes, trusted contacts will be notified.
+              Status: 🟡 Reminder: You have not completed your safety check-in.
             </p>
+
+            <p>
+                Please complete your check-in if you have arrived safely.
+            </p>
+            </div>
+          )}
+          {checkIn.status === "Second Reminder Sent" && (
+            <div>
+            <p>
+              Status: 🟡 Reminder: You have not completed your safety check-in.
+            </p>
+
+            <p>
+                Please complete your check-in if you have arrived safely.
+            </p>
+            </div>
+          )}
+
+          {checkIn.status === "Overdue" && (
+            <div>
+            <p>
+              Status: 🟠 Last Reminder: After 5 minutes, trusted contacts will be notified.
+            </p>
+
+            <p>
+                Please complete your check-in if you have arrived safely.
+            </p>
+            </div>
           )}
 
           {checkIn.status === "Alert Sent" && (
             <div>
                 <p>
-                🔴 ALERT SENT
+                Status: 🔴 ALERT SENT
                 </p>
             </div>
           )}
           {checkIn.status === "Safe Confirmed" && (
             <div>
                 <p>
-                ✅ Safety Confirmed
+                Status: ✅ Safety Confirmed
                 </p>
 
                 <p>
