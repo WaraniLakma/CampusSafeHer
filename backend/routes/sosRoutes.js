@@ -10,12 +10,24 @@ const {
 
 const {
   createSOS,
+  getMySOSNotifications,
+  deleteNotification,
 } = require("../controllers/sosController");
 
 router.post(
   "/",
   protect,
   createSOS
+);
+router.get(
+  "/notifications",
+  protect,
+  getMySOSNotifications
+);
+router.delete(
+  "/notifications/:id",
+  protect,
+  deleteNotification
 );
 
 module.exports = router;
