@@ -1,11 +1,7 @@
 const Incident = require("../models/Incident");
 
 // Create Incident Report
-const createIncident = async (e) => {
-  e.preventDefault();
-
-
-  console.log("Button clicked");  
+const createIncident = async (req, res) => {
   try {
     const {
       category,
@@ -32,13 +28,12 @@ const createIncident = async (e) => {
     });
   }
 };
-
 // Get My Incident Reports
 const getMyIncidents = async (req, res) => {
   try {
     const incidents = await Incident.find({
       user: req.user.id,
-    });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       incidents,
@@ -53,7 +48,8 @@ const getMyIncidents = async (req, res) => {
 const getAllIncidents = async (req, res) => {
   try {
     const incidents = await Incident.find()
-      .populate("user", "name email");
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       incidents,
@@ -98,10 +94,35 @@ const updateIncidentStatus = async (req, res) => {
     });
   }
 };
+const deleteIncident = async (req, res) => {
+  try {
+    const incident = await Incident.findById(
+      req.params.id
+    );
+
+    if (!incident) {
+      return res.status(404).json({
+        message: "Incident not found",
+      });
+    }
+
+    await incident.deleteOne();
+
+    res.status(200).json({
+      message:
+        "Incident deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   createIncident,
   getMyIncidents,
   getAllIncidents,
   updateIncidentStatus,
+  deleteIncident,
 };
