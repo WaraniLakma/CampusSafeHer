@@ -60,6 +60,30 @@ function Incidents() {
       console.log(error);
     }
   };
+  const deleteIncident = async (id) => {
+    try {
+        const token =
+        localStorage.getItem("token");
+
+        await API.delete(
+        `/incidents/${id}`,
+        {
+            headers: {
+            Authorization:
+                `Bearer ${token}`,
+            },
+        }
+        );
+
+        alert(
+        "Incident deleted successfully"
+        );
+
+        fetchIncidents();
+    } catch (error) {
+        console.log(error);
+    }
+  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -134,6 +158,15 @@ function Incidents() {
           <p>
             Anonymous: {incident.isAnonymous ? "Yes" : "No"}
           </p>
+          <button
+            onClick={() =>
+                deleteIncident(
+                incident._id
+                )
+            }
+            >
+            🗑 Delete Incident
+           </button>
 
           <hr />
         </div>

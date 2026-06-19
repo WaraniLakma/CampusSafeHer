@@ -43,7 +43,7 @@ function AdminDashboard() {
       console.log(error);
     }
   };
-
+  
   return (
     <div style={{ padding: "20px" }}>
       <h1>Admin Dashboard</h1>
@@ -111,6 +111,9 @@ function AdminDashboard() {
           >
             Mark Resolved
           </button>
+          
+
+          
 
           <hr />
         </div>
