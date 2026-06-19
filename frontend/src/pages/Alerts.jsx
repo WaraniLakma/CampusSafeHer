@@ -86,13 +86,32 @@ function Alerts() {
 
               
 
-              <p>
-                Status:{" "}
-                {
-                  notification.sos
-                    ?.status
-                }
-              </p>
+              {
+                notification.sos?.status ===
+                "Emergency" ? (
+                    <p
+                    style={{
+                        color: "red",
+                        fontWeight: "bold",
+                    }}
+                    >
+                    🚨 {notification.sender?.name} is in
+                    an emergency. Please contact her
+                    immediately.
+                    </p>
+                ) : (
+                    <p
+                    style={{
+                        color: "green",
+                        fontWeight: "bold",
+                    }}
+                    >
+                    ✅ {notification.sender?.name} has
+                    confirmed her safety. No further
+                    action is required.
+                    </p>
+                )
+              }
               <button
                 onClick={() =>
                     window.open(

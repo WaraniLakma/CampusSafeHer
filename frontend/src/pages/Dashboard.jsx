@@ -6,6 +6,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [showSOSPopup, setShowSOSPopup] =
   useState(false);
+  const [activeSOSId, setActiveSOSId] = useState(null);
 
   const handleSOS = () => {
     navigator.geolocation.getCurrentPosition(
@@ -25,7 +26,7 @@ function Dashboard() {
             return;
             }
 
-            await API.post(
+            const res = await API.post(
             "/sos",
             {
                 latitude:
@@ -40,7 +41,7 @@ function Dashboard() {
                 },
             }
             );
-
+            setActiveSOSId(res.data.sos._id);
             alert(
             "🚨 SOS Alert Sent Successfully!\n\nYour current location has been shared with your trusted contacts."
             );
@@ -66,7 +67,29 @@ function Dashboard() {
     
 
   };
+  const handleSafeConfirm = async () => {
+    try {
+        const token = localStorage.getItem("token");
 
+        await API.patch(
+        `/sos/${activeSOSId}/resolve`,
+        {},
+        {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+        }
+        );
+
+        alert(
+        "✅ Safety confirmed. Trusted contacts can now see that you are safe."
+        );
+
+        setActiveSOSId(null);
+    } catch (error) {
+        console.log(error);
+    }
+  };
   return (
     <div style={{ padding: "30px" }}>
       <h1>🛡️ CampusSafeHer</h1>
@@ -92,6 +115,22 @@ function Dashboard() {
       >
         SOS Alert
       </button>
+      {activeSOSId && (
+        <button
+            onClick={handleSafeConfirm}
+            style={{
+            marginTop: "10px",
+            marginLeft: "10px",
+            padding: "10px",
+            backgroundColor: "green",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            }}
+        >
+            ✅ I&apos;m Safe
+        </button>
+      )}
       {showSOSPopup && (
         <div
             style={{
