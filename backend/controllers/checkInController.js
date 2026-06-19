@@ -1,5 +1,11 @@
 const CheckIn = require("../models/CheckIn");
 
+const TrustedContact =
+  require("../models/TrustedContact");
+
+const CheckInNotification =
+  require("../models/CheckInNotification");
+
 // Create Check-In
 const createCheckIn = async (req, res) => {
   try {
@@ -51,6 +57,20 @@ const completeCheckIn = async (req, res) => {
     checkIn.status = "Safe Confirmed";
 
     await checkIn.save();
+
+    const trustedContacts =
+    await TrustedContact.find({
+        user: req.user.id,
+    });
+
+    for (const contact of trustedContacts) {
+    await CheckInNotification.create({
+        sender: req.user.id,
+        receiver: contact.trustedUser,
+        checkIn: checkIn._id,
+        type: "Safe Confirmed",
+    });
+    }
 
     res.status(200).json({
       message: "Check-In completed successfully",
@@ -138,6 +158,56 @@ const updateLocation = async (req, res) => {
     });
   }
 };
+const getMyCheckInNotifications =
+  async (req, res) => {
+    try {
+      const notifications =
+        await CheckInNotification.find({
+          receiver: req.user.id,
+        })
+          .sort({ createdAt: -1 })
+          .populate(
+            "sender",
+            "name email"
+          )
+          .populate("checkIn");
+
+      res.status(200).json({
+        notifications,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+};
+const deleteCheckInNotification =
+  async (req, res) => {
+    try {
+      const notification =
+        await CheckInNotification.findById(
+          req.params.id
+        );
+
+      if (!notification) {
+        return res.status(404).json({
+          message:
+            "Notification not found",
+        });
+      }
+
+      await notification.deleteOne();
+
+      res.status(200).json({
+        message:
+          "Notification deleted",
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+};
 
 module.exports = {
   createCheckIn,
@@ -145,4 +215,6 @@ module.exports = {
   getMyCheckIns,
   deleteCheckIn,
   updateLocation,
+  getMyCheckInNotifications,
+  deleteCheckInNotification,
 };

@@ -1,6 +1,12 @@
 const cron = require("node-cron");
 const CheckIn = require("../models/CheckIn");
 
+const TrustedContact =
+  require("../models/TrustedContact");
+
+const CheckInNotification =
+  require("../models/CheckInNotification");
+
 const startCheckInMonitor = () => {
   cron.schedule("* * * * *", async () => {
     try {
@@ -57,13 +63,29 @@ const startCheckInMonitor = () => {
 
         // Alert Sent: 5 minutes after overdue
         if (minutesLate >= interval * 3 + 5 && !checkIn.alertSent) {
-          checkIn.alertSent = true;
-          checkIn.status = "Alert Sent";
+            checkIn.alertSent = true;
+            checkIn.status = "Alert Sent";
 
-          checkIn.alertMessage =
-            "Trusted contacts have been notified. Last known location shared.";
+            checkIn.alertMessage =
+                "Trusted contacts have been notified. Last known location shared.";
 
-          console.log(`ALERT SENT for ${checkIn.destination}`);
+            const trustedContacts =
+                await TrustedContact.find({
+                user: checkIn.user,
+                });
+
+            for (const contact of trustedContacts) {
+                await CheckInNotification.create({
+                sender: checkIn.user,
+                receiver: contact.trustedUser,
+                checkIn: checkIn._id,
+                type: "Alert Sent",
+                });
+            }
+
+            console.log(
+                `ALERT SENT for ${checkIn.destination}`
+            );
         }
 
         await checkIn.save();
