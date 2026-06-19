@@ -150,6 +150,14 @@ function Dashboard() {
           📍 Safety Check-In
         </button>
 
+        <button
+        onClick={() =>
+            navigate("/alerts")
+        }
+        >
+        🚨 Incoming Alerts
+        </button>
+
         <button onClick={() => navigate("/ai")}>
           🤖 AI Safety Assistant
         </button>

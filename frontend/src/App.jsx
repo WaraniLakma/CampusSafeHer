@@ -8,6 +8,7 @@ import Incidents from "./pages/Incidents";
 import CheckIn from "./pages/CheckIn";
 import AIChat from "./pages/AIChat";
 import AdminDashboard from "./pages/AdminDashboard";
+import Alerts from "./pages/Alerts";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/checkins" element={<CheckIn />} />
         <Route path="/ai" element={<AIChat />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/alerts" element={<Alerts />} />
       </Routes>
     </BrowserRouter>
   );
