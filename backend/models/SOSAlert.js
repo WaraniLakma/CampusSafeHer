@@ -19,8 +19,8 @@ const sosSchema = new mongoose.Schema(
     },
 
     status: {
-      type: String,
-      default: "Active",
+    type: String,
+    default: "Emergency",
     },
   },
   {

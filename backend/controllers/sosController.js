@@ -45,6 +45,7 @@ const getMySOSNotifications =
         await SOSNotification.find({
           receiver: req.user.id,
         })
+          .sort({ createdAt: -1 })
           .populate(
             "sender",
             "name email"
@@ -86,11 +87,44 @@ const deleteNotification =
         message: error.message,
       });
     }
-  };
+};
+const resolveSOS = async (
+  req,
+  res
+) => {
+  try {
+    const sos =
+      await SOS.findById(
+        req.params.id
+      );
+
+    if (!sos) {
+      return res.status(404).json({
+        message:
+          "SOS Alert not found",
+      });
+    }
+
+    sos.status = "Safe Confirmed";
+
+    await sos.save();
+
+    res.status(200).json({
+      message:
+        "Safety confirmed successfully",
+      sos,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 
 module.exports = {
   createSOS,
+  resolveSOS,
   getMySOSNotifications,
   deleteNotification,
 };

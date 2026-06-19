@@ -12,6 +12,7 @@ const {
   createSOS,
   getMySOSNotifications,
   deleteNotification,
+  resolveSOS,
 } = require("../controllers/sosController");
 
 router.post(
@@ -29,5 +30,9 @@ router.delete(
   protect,
   deleteNotification
 );
-
+router.patch(
+  "/:id/resolve",
+  protect,
+  resolveSOS
+);
 module.exports = router;
