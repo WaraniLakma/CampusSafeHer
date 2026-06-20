@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.webp";
-import heroImage from "../assets/hero.webp";
+import heroImage from "../assets/herosection.png";
 import sosImage from "../assets/sos.jpg";
 import checkInImage from "../assets/checkins.png";
 import contactsImage from "../assets/contacts.jpg";
@@ -213,6 +213,7 @@ function HomePage() {
             </div>
         </section>
         <section
+            id="features"
             style={{
                 padding: "80px 50px",
                 textAlign: "center",
@@ -481,20 +482,22 @@ function HomePage() {
                 them.
                 </p>
 
+                <a href="#features">
                 <button
-                style={{
+                    style={{
                     marginTop: "20px",
                     padding: "14px 30px",
                     borderRadius: "12px",
                     border: "none",
                     background:
-                    "linear-gradient(90deg,#8b5cf6,#ec4899)",
+                        "linear-gradient(90deg,#8b5cf6,#ec4899)",
                     color: "white",
                     cursor: "pointer",
-                }}
+                    }}
                 >
-                Learn More About Us
+                    Explore Features
                 </button>
+                </a>
             </div>
 
             {/* Right Side */}
@@ -515,6 +518,218 @@ function HomePage() {
                 />
             </div>
         </section>
+        <section
+            style={{
+                margin: "60px",
+                padding: "40px",
+                borderRadius: "25px",
+                background:
+                "linear-gradient(90deg,#6d28d9,#ec4899)",
+                color: "white",
+            }}
+            >
+            <div
+                style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "30px",
+                }}
+            >
+                {/* Left Side */}
+                <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "25px",
+                }}
+                >
+                <img
+                    src={logo}
+                    alt="CampusSafeHer Logo"
+                    style={{
+                    width: "110px",
+                    height: "100px",
+                    borderRadius: "20px",
+                    backgroundColor: "white",
+                    padding: "10px",
+                    }}
+                />
+
+                <div>
+                    <h2
+                    style={{
+                        fontSize: "2.5rem",
+                        marginBottom: "15px",
+                    }}
+                    >
+                    Ready to Take Control
+                    <br />
+                    of Your Safety?
+                    </h2>
+
+                    <p
+                    style={{
+                        fontSize: "18px",
+                        opacity: "0.9",
+                        maxWidth: "500px",
+                    }}
+                    >
+                    Join thousands of students who trust
+                    CampusSafeHer to stay connected,
+                    protected, and informed.
+                    </p>
+                </div>
+                </div>
+
+                {/* Right Side */}
+                <Link to="/register">
+                <button
+                    style={{
+                    padding: "18px 35px",
+                    borderRadius: "15px",
+                    border: "none",
+                    backgroundColor: "white",
+                    color: "#d63384",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    }}
+                >
+                    Get Started Now →
+                </button>
+                </Link>
+            </div>
+        </section>
+        <footer
+            style={{
+                backgroundColor: "#1f1147",
+                color: "white",
+                padding: "50px 60px 20px",
+                marginTop: "80px",
+            }}
+            >
+            <div
+                style={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "40px",
+                }}
+            >
+                {/* Brand Section */}
+                <div>
+                <div
+                    style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "15px",
+                    }}
+                >
+                    <img
+                    src={logo}
+                    alt="CampusSafeHer"
+                    style={{
+                        width: "50px",
+                        borderRadius: "10px",
+                        backgroundColor: "white",
+                        padding: "5px",
+                    }}
+                    />
+
+                    <h3>CampusSafeHer</h3>
+                </div>
+
+                <p
+                    style={{
+                    maxWidth: "300px",
+                    color: "#d1d5db",
+                    }}
+                >
+                    Empowering female students with
+                    technology-driven safety solutions,
+                    emergency support, and trusted
+                    connections.
+                </p>
+                </div>
+
+                {/* Quick Links */}
+                <div>
+                <h3>Quick Links</h3>
+
+                <p>
+                    <Link
+                    to="/"
+                    style={{
+                        color: "#d1d5db",
+                        textDecoration: "none",
+                    }}
+                    >
+                    Home
+                    </Link>
+                </p>
+
+                <p>
+                    <Link
+                    to="/login"
+                    style={{
+                        color: "#d1d5db",
+                        textDecoration: "none",
+                    }}
+                    >
+                    Login
+                    </Link>
+                </p>
+
+                <p>
+                    <Link
+                    to="/register"
+                    style={{
+                        color: "#d1d5db",
+                        textDecoration: "none",
+                    }}
+                    >
+                    Register
+                    </Link>
+                </p>
+                </div>
+
+                {/* Contact */}
+                <div>
+                <h3>Contact</h3>
+
+                <p style={{ color: "#d1d5db" }}>
+                    support@campussafeher.com
+                </p>
+
+                <p style={{ color: "#d1d5db" }}>
+                    University of Ruhuna
+                </p>
+
+                <p style={{ color: "#d1d5db" }}>
+                    DesignHer 2.0 Project
+                </p>
+                </div>
+            </div>
+
+            <hr
+                style={{
+                margin: "30px 0 20px",
+                borderColor: "#444",
+                }}
+            />
+
+            <p
+                style={{
+                textAlign: "center",
+                color: "#9ca3af",
+                }}
+            >
+                © 2026 CampusSafeHer. All Rights Reserved.
+            </p>
+        </footer>
                 
     </div>
   );
