@@ -389,9 +389,9 @@ function Dashboard() {
                 }}
                 >
                 {user?.name
-                ?.split(" ")[0]
-                ?.charAt(0)
-                ?.toUpperCase()}
+            ?.split(" ")[0]
+            ?.charAt(0)
+            ?.toUpperCase()}
             </div>
 
             {showProfile && (
@@ -501,26 +501,257 @@ function Dashboard() {
 
         {/* WELCOME */}
         <div
-            style={{
+        style={{
             marginTop: "40px",
+        }}
+        >
+        <h1
+            style={{
+            color: "#1f1147",
             }}
         >
-            <h1
-            style={{
-                color: "#1f1147",
-            }}
-            >
             Welcome Back 👋
-            </h1>
+        </h1>
 
-            <p>
+        <p>
             Your personal safety center.
             Stay connected, protected
             and informed.
+        </p>
+        </div>
+
+        {/* QUICK ACTIONS */}
+        <div
+        style={{
+            marginTop: "40px",
+        }}
+        >
+        <h2
+            style={{
+            color: "#1f1147",
+            marginBottom: "25px",
+            }}
+        >
+            Quick Actions
+        </h2>
+
+        <div
+            style={{
+            display: "flex",
+            gap: "40px",
+            flexWrap: "wrap",
+            alignItems: "center",
+            }}
+        >
+            {/* SOS CIRCLE */}
+            <div
+            onClick={() => setShowSOSPopup(true)}
+            style={{
+                width: "220px",
+                height: "220px",
+                borderRadius: "50%",
+                background:
+                "linear-gradient(135deg,#ec4899,#8b5cf6)",
+                color: "white",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+                boxShadow:
+                "0 10px 25px rgba(236,72,153,0.3)",
+            }}
+            >
+            <div
+                style={{
+                fontSize: "55px",
+                }}
+            >
+                🚨
+            </div>
+
+            <h3>SOS</h3>
+
+            <p
+                style={{
+                textAlign: "center",
+                padding: "0 50px",
+                }}
+            >
+                Send Emergency Alert
             </p>
+            </div>
+
+            {/* STATS CARDS */}
+            <div
+            style={{
+                display: "grid",
+                gridTemplateColumns:
+                "repeat(2,180px)",
+                gap: "20px",
+            }}
+            >
+            <div
+            style={{
+                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                color: "white",
+                padding: "20px",
+                borderRadius: "20px",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+            >
+            <span>📍 CheckIns</span>
+            <span
+                style={{
+                fontSize: "24px",
+                }}
+            >
+                →
+            </span>
+            </div>
+
+            <div
+            style={{
+                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                color: "white",
+                padding: "20px",
+                borderRadius: "20px",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+            >
+            <span>🚨 Alerts</span>
+            <span
+                style={{
+                fontSize: "24px",
+                }}
+            >
+                →
+            </span>
+            </div>
+
+            <div
+            style={{
+                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                color: "white",
+                padding: "20px",
+                borderRadius: "20px",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+            >
+            <span>📝 Reports</span>
+            <span
+                style={{
+                fontSize: "24px",
+                }}
+            >
+                →
+            </span>
+            </div>
+
+            <div
+            style={{
+                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                color: "white",
+                padding: "20px",
+                borderRadius: "20px",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}
+            >
+            <span>👥Contacts</span>
+            <span
+                style={{
+                fontSize: "24px",
+                }}
+            >
+                →
+            </span>
+            </div>
+            </div>
+        </div>
+
+        {/* QUICK ACCESS */}
+        <h2
+            style={{
+            marginTop: "50px",
+            color: "#1f1147",
+            }}
+        >
+            Quick Access
+        </h2>
+
+        <div
+            style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "15px",
+            marginTop: "20px",
+            maxWidth: "600px",
+            }}
+        >
+            <button
+            onClick={() => navigate("/contacts")}
+            style={{
+                padding: "18px",
+                border: "none",
+                borderRadius: "18px",
+                background:
+                "linear-gradient(90deg,#ec4899,#f97316)",
+                color: "white",
+                fontSize: "18px",
+                cursor: "pointer",
+            }}
+            >
+            👥 Manage Contacts
+            </button>
+
+            <button
+            onClick={() => navigate("/incidents")}
+            style={{
+                padding: "18px",
+                border: "none",
+                borderRadius: "18px",
+                background:
+                "linear-gradient(90deg,#ec4899,#f97316)",
+                color: "white",
+                fontSize: "18px",
+                cursor: "pointer",
+            }}
+            >
+            📝 Report Incident
+            </button>
+
+            <button
+            onClick={() => navigate("/ai")}
+            style={{
+                padding: "18px",
+                border: "none",
+                borderRadius: "18px",
+                background:
+                "linear-gradient(90deg,#ec4899,#f97316)",
+                color: "white",
+                fontSize: "18px",
+                cursor: "pointer",
+            }}
+            >
+            🤖 Ask AI Assistant
+            </button>
+        </div>
         </div>
         </div>
     </div>
+    
    );
 }
 
