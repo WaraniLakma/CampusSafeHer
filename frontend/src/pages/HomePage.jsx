@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.webp";
 import heroImage from "../assets/hero.webp";
+import sosImage from "../assets/sos.jpg";
+import checkInImage from "../assets/checkins.png";
+import contactsImage from "../assets/contacts.jpg";
+import incidentImage from "../assets/incident.jpg";
+import aiImage from "../assets/aisafety.webp";
+import aboutImage from "../assets/about.jpg";
 function HomePage() {
 
   return (
@@ -206,6 +212,310 @@ function HomePage() {
                 />
             </div>
         </section>
+        <section
+            style={{
+                padding: "80px 50px",
+                textAlign: "center",
+            }}
+            >
+            <p
+                style={{
+                color: "#ec4899",
+                fontWeight: "bold",
+                fontSize: "18px",
+                }}
+            >
+                Our Features
+            </p>
+
+            <h2
+                style={{
+                fontSize: "2.5rem",
+                color: "#1f1147",
+                marginBottom: "50px",
+                }}
+            >
+                Designed for Your Safety
+            </h2>
+
+            <div
+                style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "25px",
+                flexWrap: "wrap",
+                }}
+            >
+                {/* SOS */}
+                <div
+                style={{
+                    width: "250px",
+                    background: "white",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    boxShadow:
+                    "0 5px 20px rgba(0,0,0,0.08)",
+                }}
+                >
+                <img
+                    src={sosImage}
+                    alt="SOS"
+                    style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: "20px" }}>
+                    <h3>🚨 Emergency SOS</h3>
+
+                    <p>
+                    Send instant SOS alerts to your
+                    trusted contacts during
+                    emergencies.
+                    </p>
+                </div>
+                </div>
+
+                {/* Check-In */}
+                <div
+                style={{
+                    width: "250px",
+                    background: "white",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    boxShadow:
+                    "0 5px 20px rgba(0,0,0,0.08)",
+                }}
+                >
+                <img
+                    src={checkInImage}
+                    alt="Check-In"
+                    style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: "20px" }}>
+                    <h3>📍 Safety Check-In</h3>
+
+                    <p>
+                    Keep your trusted contacts
+                    informed about your journey and
+                    arrival.
+                    </p>
+                </div>
+                </div>
+
+                {/* Trusted Contacts */}
+                <div
+                style={{
+                    width: "250px",
+                    background: "white",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    boxShadow:
+                    "0 5px 20px rgba(0,0,0,0.08)",
+                }}
+                >
+                <img
+                    src={contactsImage}
+                    alt="Trusted Contacts"
+                    style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: "20px" }}>
+                    <h3>👨‍👩‍👧 Trusted Contacts</h3>
+
+                    <p>
+                    Manage trusted contacts who
+                    receive emergency notifications
+                    when needed.
+                    </p>
+                </div>
+                </div>
+
+                {/* Incident Reports */}
+                <div
+                style={{
+                    width: "250px",
+                    background: "white",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    boxShadow:
+                    "0 5px 20px rgba(0,0,0,0.08)",
+                }}
+                >
+                <img
+                    src={incidentImage}
+                    alt="Incident Reports"
+                    style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: "20px" }}>
+                    <h3>📝 Incident Reports</h3>
+
+                    <p>
+                    Report incidents anonymously or
+                    openly to help improve campus
+                    safety.
+                    </p>
+                </div>
+                </div>
+
+                {/* AI Assistant */}
+                <div
+                style={{
+                    width: "250px",
+                    background: "white",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    boxShadow:
+                    "0 5px 20px rgba(0,0,0,0.08)",
+                }}
+                >
+                <img
+                    src={aiImage}
+                    alt="AI Assistant"
+                    style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: "20px" }}>
+                    <h3>🤖 AI Assistant</h3>
+
+                    <p>
+                    Get safety guidance, emergency
+                    tips, and support anytime through
+                    our AI assistant.
+                    </p>
+                </div>
+                </div>
+            </div>
+        </section>
+        <section
+            id="about"
+            style={{
+                padding: "100px 60px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "60px",
+                background:
+                "linear-gradient(to right,#fff7fb,#ffffff)",
+            }}
+            >
+            {/* Left Side */}
+            <div
+                style={{
+                flex: 1,
+                }}
+            >
+                <p
+                style={{
+                    color: "#ec4899",
+                    fontWeight: "bold",
+                }}
+                >
+                About CampusSafeHer
+                </p>
+
+                <h2
+                style={{
+                    fontSize: "3rem",
+                    color: "#1f1147",
+                    lineHeight: "1.3",
+                }}
+                >
+                Building a Safer Tomorrow
+                <br />
+
+                <span
+                    style={{
+                    color: "#ec4899",
+                    }}
+                >
+                    for Every Woman
+                </span>
+                </h2>
+
+                <p
+                style={{
+                    color: "#555",
+                    lineHeight: "1.8",
+                    marginTop: "20px",
+                }}
+                >
+                CampusSafeHer was designed to provide
+                a safe and supportive environment for
+                female university students by combining
+                emergency response tools, trusted
+                contact networks, incident reporting,
+                and intelligent safety assistance into
+                one platform.
+                </p>
+
+                <p
+                style={{
+                    color: "#555",
+                    lineHeight: "1.8",
+                }}
+                >
+                Our mission is to empower women through
+                technology that not only responds to
+                emergencies but also helps prevent
+                them.
+                </p>
+
+                <button
+                style={{
+                    marginTop: "20px",
+                    padding: "14px 30px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background:
+                    "linear-gradient(90deg,#8b5cf6,#ec4899)",
+                    color: "white",
+                    cursor: "pointer",
+                }}
+                >
+                Learn More About Us
+                </button>
+            </div>
+
+            {/* Right Side */}
+            <div
+                style={{
+                flex: 1,
+                textAlign: "center",
+                }}
+            >
+                <img
+                src={aboutImage}
+                alt="About CampusSafeHer"
+                style={{
+                    width: "100%",
+                    maxWidth: "500px",
+                    borderRadius: "30px",
+                }}
+                />
+            </div>
+        </section>
+                
     </div>
   );
 }
