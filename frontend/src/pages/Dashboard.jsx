@@ -2,6 +2,7 @@ import { useState,useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import logo from "../assets/logo.webp";
+import dashboardBg from "../assets/dashboard-bg.png";
 
 
 function Dashboard() {
@@ -14,11 +15,33 @@ function Dashboard() {
   const [showProfile, setShowProfile] =
   useState(false);
   const [user, setUser] = useState(null);
+  const [stats, setStats] = useState({
+  contacts: 0,
+  incidents: 0,
+  checkins: 0,
+  alerts: 0,
+});
 
   useEffect(() => {
     fetchUser();
-    
-    }, []);
+    fetchDashboardStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await API.get("/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setStats(res.data.stats);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSOS = () => {
     navigator.geolocation.getCurrentPosition(
@@ -118,6 +141,54 @@ function Dashboard() {
         );
 
         setUser(res.data.user);
+    } catch (error) {
+        console.log(error);
+    }
+  };
+  const fetchDashboardStats = async () => {
+    try {
+        const token =
+        localStorage.getItem("token");
+
+        const headers = {
+        Authorization: `Bearer ${token}`,
+        };
+
+        const [
+        contactsRes,
+        incidentsRes,
+        checkinsRes,
+        sosAlertsRes,
+        checkinAlertsRes,
+        ] = await Promise.all([
+        API.get("/contacts", { headers }),
+        API.get("/incidents", { headers }),
+        API.get("/checkins", { headers }),
+        API.get("/sos/notifications", { headers }),
+        API.get("/checkins/notifications", {
+            headers,
+        }),
+        ]);
+
+        setStats({
+        contacts:
+            contactsRes.data.contacts?.length ||
+            0,
+
+        incidents:
+            incidentsRes.data.incidents?.length ||
+            0,
+
+        checkins:
+            checkinsRes.data.checkIns?.length ||
+            0,
+
+        alerts:
+            (sosAlertsRes.data.notifications
+            ?.length || 0) +
+            (checkinAlertsRes.data.notifications
+            ?.length || 0),
+        });
     } catch (error) {
         console.log(error);
     }
@@ -327,6 +398,11 @@ function Dashboard() {
         style={{
             flex: 1,
             padding: "30px",
+
+            backgroundImage: `url(${dashboardBg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center right",
+            backgroundRepeat: "no-repeat",
         }}
         >
         {/* TOP BAR */}
@@ -545,13 +621,20 @@ function Dashboard() {
         >
             {/* SOS CIRCLE */}
             <div
-            onClick={() => setShowSOSPopup(true)}
+            onClick={() => {
+            if (activeSOSId) {
+                handleSafeConfirm();
+            } else {
+                setShowSOSPopup(true);
+            }
+            }}
             style={{
                 width: "220px",
                 height: "220px",
                 borderRadius: "50%",
-                background:
-                "linear-gradient(135deg,#ec4899,#8b5cf6)",
+                background: activeSOSId
+                ? "linear-gradient(135deg,#10b981,#22c55e)"
+                : "linear-gradient(135deg,#ec4899,#8b5cf6)",
                 color: "white",
                 display: "flex",
                 flexDirection: "column",
@@ -562,24 +645,49 @@ function Dashboard() {
                 "0 10px 25px rgba(236,72,153,0.3)",
             }}
             >
-            <div
-                style={{
-                fontSize: "55px",
-                }}
-            >
-                🚨
-            </div>
+            {activeSOSId ? (
+                <>
+                    <div
+                    style={{
+                        fontSize: "55px",
+                    }}
+                    >
+                    ✅
+                    </div>
 
-            <h3>SOS</h3>
+                    <h3>I'm Safe</h3>
 
-            <p
-                style={{
-                textAlign: "center",
-                padding: "0 50px",
-                }}
-            >
-                Send Emergency Alert
-            </p>
+                    <p
+                    style={{
+                        textAlign: "center",
+                        padding: "0 30px",
+                    }}
+                    >
+                    Confirm Safety Status
+                    </p>
+                </>
+                ) : (
+                <>
+                    <div
+                    style={{
+                        fontSize: "55px",
+                    }}
+                    >
+                    🚨
+                    </div>
+
+                    <h3>SOS</h3>
+
+                    <p
+                    style={{
+                        textAlign: "center",
+                        padding: "0 30px",
+                    }}
+                    >
+                    Send Emergency Alert
+                    </p>
+                </>
+                )}
             </div>
 
             {/* STATS CARDS */}
@@ -592,93 +700,227 @@ function Dashboard() {
             }}
             >
             <div
+            onClick={() => navigate("/checkins")}
             style={{
                 background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
                 color: "white",
                 padding: "20px",
                 borderRadius: "20px",
-                textAlign: "center",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                cursor: "pointer"
             }}
             >
-            <span>📍 CheckIns</span>
-            <span
+            <span>
+                📍 CheckIns
+            </span>
+
+            <div
                 style={{
-                fontSize: "24px",
+                display: "flex",
+                alignItems: "center",
+                gap: "15px",
                 }}
             >
+                <span
+                style={{
+                    fontSize: "40px",
+                    fontWeight: "bold",
+                }}
+                >
+                {stats.checkins}
+                </span>
+
+                <span
+                style={{
+                    fontSize: "24px",
+                }}
+                >
                 →
-            </span>
+                </span>
+            </div>
             </div>
 
             <div
+            onClick={() => navigate("/alerts")}
             style={{
                 background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
                 color: "white",
                 padding: "20px",
                 borderRadius: "20px",
-                textAlign: "center",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                cursor: "pointer"
             }}
             >
-            <span>🚨 Alerts</span>
-            <span
+            <span>
+                🚨 Alerts
+            </span>
+
+            <div
                 style={{
-                fontSize: "24px",
+                display: "flex",
+                alignItems: "center",
+                gap: "15px",
                 }}
             >
+                <span
+                style={{
+                    fontSize: "40px",
+                    fontWeight: "bold",
+                }}
+                >
+                {stats.alerts}
+                </span>
+
+                <span
+                style={{
+                    fontSize: "24px",
+                }}
+                >
                 →
-            </span>
+                </span>
+            </div>
             </div>
 
             <div
+            onClick={() => navigate("/incidents")}
             style={{
                 background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
                 color: "white",
                 padding: "20px",
                 borderRadius: "20px",
-                textAlign: "center",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                cursor: "pointer"
             }}
             >
-            <span>📝 Reports</span>
-            <span
+            <span>
+                📝Reports
+            </span>
+
+            <div
                 style={{
-                fontSize: "24px",
+                display: "flex",
+                alignItems: "center",
+                gap: "15px",
                 }}
             >
+                <span
+                style={{
+                    fontSize: "40px",
+                    fontWeight: "bold",
+                }}
+                >
+                {stats.incidents}
+                </span>
+
+                <span
+                style={{
+                    fontSize: "24px",
+                }}
+                >
                 →
-            </span>
+                </span>
+            </div>
             </div>
 
             <div
+            onClick={() => navigate("/contacts")}
             style={{
                 background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
                 color: "white",
                 padding: "20px",
                 borderRadius: "20px",
-                textAlign: "center",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                cursor: "pointer"
             }}
             >
-            <span>👥Contacts</span>
-            <span
+            <span>
+                👥Contacts
+            </span>
+
+            <div
                 style={{
-                fontSize: "24px",
+                display: "flex",
+                alignItems: "center",
+                gap: "15px",
                 }}
             >
+                <span
+                style={{
+                    fontSize: "40px",
+                    fontWeight: "bold",
+                }}
+                >
+                {stats.contacts}
+                </span>
+
+                <span
+                style={{
+                    fontSize: "24px",
+                }}
+                >
                 →
-            </span>
+                </span>
             </div>
             </div>
+            </div>
+            {showSOSPopup && (
+                <div
+                    style={{
+                    backgroundColor: "white",
+                    border: "2px solid #ec4899",
+                    padding: "25px",
+                    marginTop: "30px",
+                    borderRadius: "20px",
+                    boxShadow: "0 8px 20px rgba(236,72,153,0.15)",
+                    maxWidth: "500px",
+                    }}
+                >
+                    <h3 style={{ color: "#1f1147" }}>
+                    ⚠️ Send Emergency Alert?
+                    </h3>
+
+                    <p>
+                    Your trusted contacts will be notified
+                    with your current location.
+                    </p>
+
+                    <button
+                    onClick={() => setShowSOSPopup(false)}
+                    style={{
+                        marginRight: "10px",
+                        padding: "10px 20px",
+                        borderRadius: "10px",
+                        border: "1px solid #ccc",
+                        cursor: "pointer",
+                    }}
+                    >
+                    Cancel
+                    </button>
+
+                    <button
+                    onClick={handleSOS}
+                    style={{
+                        padding: "10px 20px",
+                        borderRadius: "10px",
+                        border: "none",
+                        background:
+                        "linear-gradient(90deg,#ec4899,#8b5cf6)",
+                        color: "white",
+                        cursor: "pointer",
+                    }}
+                    >
+                    Send SOS
+                    </button>
+                </div>
+                )}
         </div>
 
         {/* QUICK ACCESS */}
