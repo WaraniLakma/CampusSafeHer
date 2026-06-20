@@ -9,11 +9,13 @@ import CheckIn from "./pages/CheckIn";
 import AIChat from "./pages/AIChat";
 import AdminDashboard from "./pages/AdminDashboard";
 import Alerts from "./pages/Alerts";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
