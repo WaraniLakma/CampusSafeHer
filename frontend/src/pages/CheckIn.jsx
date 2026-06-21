@@ -28,7 +28,7 @@ function getStatusBadge(status) {
     Active: { bg: "#dcfce7", color: "#15803d", label: "🟢 Active", desc: "Awaiting expected arrival time." },
     "First Reminder Sent": { bg: "#fef9c3", color: "#a16207", label: "🟡 1st Reminder", desc: "Please complete your check-in if you have arrived safely." },
     "Second Reminder Sent": { bg: "#fef9c3", color: "#a16207", label: "🟡 2nd Reminder", desc: "Please complete your check-in if you have arrived safely." },
-    Overdue: { bg: "#ffedd5", color: "#c2410c", label: "🟠 Last Reminder", desc: "After 5 minutes, trusted contacts will be notified." },
+    Overdue: { bg: "#ffedd5", color: "#c2410c", label: "🟠 Last Reminder", desc: "After 5 seconds, trusted contacts will be notified." },
     "Alert Sent": { bg: "#fee2e2", color: "#b91c1c", label: "🔴 Alert Sent", desc: "Trusted contacts have been notified." },
     "Safe Confirmed": { bg: "#dcfce7", color: "#15803d", label: "✅ Safety Confirmed", desc: "Trusted contacts will be notified that you arrived safely." },
   };
@@ -600,7 +600,7 @@ function CheckIn() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <label style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>
-                  Reminder Interval (minutes)
+                  Reminder Interval (seconds)
                 </label>
                 <input
                   type="number"
@@ -618,7 +618,7 @@ function CheckIn() {
                   }}
                 />
                 <p style={{ margin: 0, fontSize: "13px", color: "#6b6375" }}>
-                  Reminders every {reminderInterval} minute(s)
+                  Reminders every {reminderInterval} second(s)
                 </p>
               </div>
 

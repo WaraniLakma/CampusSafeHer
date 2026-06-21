@@ -161,15 +161,7 @@ function Login() {
                 marginBottom: "30px",
             }}
             >
-            <span
-                style={{
-                color: "#ec4899",
-                cursor: "pointer",
-                fontSize: "14px",
-                }}
-            >
-                Forgot Password?
-            </span>
+            
             </div>
 
             {/* LOGIN BUTTON */}
