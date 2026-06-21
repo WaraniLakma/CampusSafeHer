@@ -32,6 +32,16 @@ const incidentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    attachment: {
+      type: String,
+      default: "",
+    },
+
+    attachmentName: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

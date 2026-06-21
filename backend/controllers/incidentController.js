@@ -8,6 +8,8 @@ const createIncident = async (req, res) => {
       description,
       location,
       isAnonymous,
+      attachment,
+      attachmentName,
     } = req.body;
 
     const incident = await Incident.create({
@@ -16,6 +18,8 @@ const createIncident = async (req, res) => {
       description,
       location,
       isAnonymous,
+      attachment,
+      attachmentName,
     });
 
     res.status(201).json({
