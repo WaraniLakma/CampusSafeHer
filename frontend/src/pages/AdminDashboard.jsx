@@ -860,6 +860,92 @@ function AdminDashboard() {
                     </div>
                   </div>
 
+                  {/* ATTACHMENT DISPLAY FOR ADMIN */}
+                  {incident.attachment && (
+                    <div
+                      style={{
+                        backgroundColor: "#f8fafc",
+                        padding: "15px",
+                        borderRadius: "12px",
+                        border: "1px solid #cbd5e1",
+                        marginTop: "15px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <div style={{ fontSize: "13px", fontWeight: "600", color: "#475569" }}>
+                        Attached Document / Photo:
+                      </div>
+                      
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                        {incident.attachment.startsWith("data:image") ? (
+                          <div style={{ position: "relative" }}>
+                            <img
+                              src={incident.attachment}
+                              alt="attached"
+                              style={{
+                                maxWidth: "200px",
+                                maxHeight: "150px",
+                                objectFit: "contain",
+                                borderRadius: "8px",
+                                border: "1px solid #cbd5e1",
+                                cursor: "zoom-in",
+                              }}
+                              onClick={() => {
+                                const w = window.open();
+                                w.document.write(`<img src="${incident.attachment}" style="max-width:100%; max-height:100%; display:block; margin:auto;"/>`);
+                                w.document.title = incident.attachmentName || "View Image";
+                              }}
+                            />
+                            <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
+                              Click image to expand 🔍
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              padding: "10px 15px",
+                              backgroundColor: "white",
+                              borderRadius: "8px",
+                              border: "1px solid #cbd5e1",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <span style={{ fontSize: "20px" }}>📄</span>
+                            <span style={{ fontSize: "14px", color: "#1f1147", fontWeight: "500" }}>
+                              {incident.attachmentName || "Document File"}
+                            </span>
+                          </div>
+                        )}
+                        
+                        <a
+                          href={incident.attachment}
+                          download={incident.attachmentName || "download"}
+                          style={{
+                            padding: "10px 16px",
+                            borderRadius: "10px",
+                            backgroundColor: "#8b5cf6",
+                            color: "white",
+                            textDecoration: "none",
+                            fontWeight: "bold",
+                            fontSize: "13px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            boxShadow: "0 2px 8px rgba(139,92,246,0.2)",
+                            cursor: "pointer",
+                          }}
+                          className="btn-action"
+                        >
+                          ⬇️ Download Attachment
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
                   {/* REPORTER DETAILS & ACTION BUTTONS */}
                   <div
                     style={{
