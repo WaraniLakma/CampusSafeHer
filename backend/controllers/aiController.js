@@ -7,19 +7,63 @@ const ai = new GoogleGenAI({
 const chatWithAI = async (req, res) => {
   try {
     const { message } = req.body;
+    const lowerMessage =
+    message.toLowerCase();
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `
-You are CampusSafeHer AI, a safety assistant for female university students.
+    const isFormalDocument =
+    lowerMessage.includes("letter") ||
+    lowerMessage.includes("email") ||
+    lowerMessage.includes("complaint") ||
+    lowerMessage.includes("application") ||
+    lowerMessage.includes("report") ||
+    lowerMessage.includes("request");
 
-User Question:
-${message}
+    let prompt;
 
-Provide practical safety advice.
-`,
-    });
+    if (isFormalDocument) {
+    prompt = `
+    You are CampusSafeHer AI.
 
+    The user is requesting a formal document.
+
+    Requirements:
+    - Output only the requested document.
+    - No emojis.
+    - No markdown symbols.
+    - No bullet points.
+    - No decorative formatting.
+    - No introductions about yourself.
+    - Do not say "I am CampusSafeHer AI".
+    - Write professionally.
+    - Make it ready to copy and send.
+
+    User Request:
+    ${message}
+    `;
+    } else {
+    prompt = `
+    You are CampusSafeHer AI.
+
+    The user is asking for advice or guidance.
+
+    Requirements:
+    - Be friendly and supportive.
+    - Use emojis naturally.
+    - Use numbered lists and bullet points.
+    - Use short paragraphs.
+    - Make the answer engaging and easy to read.
+    - Never use markdown symbols like **, ##, ---.
+
+    User Request:
+    ${message}
+    `;
+    }
+    const response =
+      await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+      });
+    
     res.status(200).json({
       reply: response.text,
     });
