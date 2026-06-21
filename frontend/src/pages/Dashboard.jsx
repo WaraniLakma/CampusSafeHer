@@ -271,7 +271,7 @@ function Dashboard() {
                 "transparent";
                 e.currentTarget.style.color = "#1f1147";
             }}
-            onClick={() => navigate("/contacts")}
+            onClick={() => navigate("/dashboard")}
             >
             🏠 Dashboard
             </span>
@@ -317,7 +317,7 @@ function Dashboard() {
                 "transparent";
                 e.currentTarget.style.color = "#1f1147";
             }}
-            onClick={() => navigate("/contacts")}
+            onClick={() => navigate("/incidents")}
             >
             📝 Incidents
             </span>
@@ -340,7 +340,7 @@ function Dashboard() {
                 "transparent";
                 e.currentTarget.style.color = "#1f1147";
             }}
-            onClick={() => navigate("/contacts")}
+            onClick={() => navigate("/checkins")}
             >
             📍 Check-Ins
             </span>
@@ -363,7 +363,7 @@ function Dashboard() {
                 "transparent";
                 e.currentTarget.style.color = "#1f1147";
             }}
-            onClick={() => navigate("/contacts")}
+            onClick={() => navigate("/alerts")}
             >
             🔔 Alerts
             </span>
@@ -386,7 +386,7 @@ function Dashboard() {
                 "transparent";
                 e.currentTarget.style.color = "#1f1147";
             }}
-            onClick={() => navigate("/contacts")}
+            onClick={() => navigate("/ai")}
             >
             🤖 AI Assistant
             </span>
