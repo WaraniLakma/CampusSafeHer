@@ -185,7 +185,7 @@ function CheckIn() {
 
       await API.post(
         "/checkins",
-        { destination, expectedArrivalTime, reminderInterval, currentLatitude, currentLongitude },
+        { destination, expectedArrivalTime : new Date(checkIn.expectedArrivalTime).toLocaleString(), reminderInterval, currentLatitude, currentLongitude },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -714,9 +714,7 @@ function CheckIn() {
                       </div>
 
                       <p style={{ margin: "0 0 6px", fontSize: "14px", color: "#64748b" }}>
-                        🕐 Expected: {new Date(checkIn.expectedArrivalTime).toLocaleString("en-LK", {
-                            timeZone: "Asia/Colombo",
-                            })}
+                        🕐 Expected: {new Date(checkIn.expectedArrivalTime).toLocaleString()}
                       </p>
                       {badge.desc && (
                         <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#6b6375" }}>{badge.desc}</p>

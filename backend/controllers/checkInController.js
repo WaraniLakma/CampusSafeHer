@@ -10,25 +10,15 @@ const CheckInNotification =
 const createCheckIn = async (req, res) => {
   try {
     const {
-      destination,
-      expectedArrivalTime,
-      reminderInterval,
-      currentLatitude,
-      currentLongitude,
+      destination,expectedArrivalTime,reminderInterval,currentLatitude,currentLongitude,
     } = req.body;
 
     const checkIn = await CheckIn.create({
       user: req.user.id,
-      destination,
-      expectedArrivalTime,
-      reminderInterval,
-      currentLatitude,
-      currentLongitude,
+      destination,expectedArrivalTime,reminderInterval,currentLatitude,currentLongitude,
 
       lastKnownLatitude: currentLatitude,
       lastKnownLongitude: currentLongitude,
-
-
     });
 
     res.status(201).json({
