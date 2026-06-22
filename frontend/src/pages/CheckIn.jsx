@@ -185,7 +185,7 @@ function CheckIn() {
 
       await API.post(
         "/checkins",
-        { destination, expectedArrivalTime : new Date(checkIn.expectedArrivalTime).toLocaleString(), reminderInterval, currentLatitude, currentLongitude },
+        { destination, expectedArrivalTime : new Date(expectedArrivalTime), reminderInterval, currentLatitude, currentLongitude },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
