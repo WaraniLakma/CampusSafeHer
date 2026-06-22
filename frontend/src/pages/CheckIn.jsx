@@ -714,11 +714,9 @@ function CheckIn() {
                       </div>
 
                       <p style={{ margin: "0 0 6px", fontSize: "14px", color: "#64748b" }}>
-                        🕐 Expected: {new Date(checkIn.expectedArrivalTime).toLocaleTimeString("en-LK", {
-                        timeZone: "Asia/Colombo",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        })}
+                        🕐 Expected: {new Date(checkIn.expectedArrivalTime).toLocaleString("en-LK", {
+                            timeZone: "Asia/Colombo",
+                            })}
                       </p>
                       {badge.desc && (
                         <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#6b6375" }}>{badge.desc}</p>
