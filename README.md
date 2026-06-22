@@ -202,25 +202,7 @@ By integrating Artificial Intelligence with practical safety tools, CampusSafeHe
 
 ![Admin Dashboard](./screenshots/Admin.jpeg)
 
-### Home Page
 
-(Add Screenshot Here)
-
-### Registration Page
-
-(Add Screenshot Here)
-
-### Student Dashboard
-
-(Add Screenshot Here)
-
-### AI Safety Assistant
-
-(Add Screenshot Here)
-
-### Admin Dashboard
-
-(Add Screenshot Here)
 
 ---
 
