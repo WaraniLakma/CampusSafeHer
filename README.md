@@ -1,5 +1,17 @@
 # CampusSafeHer
 
+## Deployment URL
+
+🔗 **Live Application:**
+https://campus-safe-her.vercel.app
+
+---
+
+## Demonstration Video
+
+🎥 **Watch the Demo Video:**
+https://drive.google.com/file/d/1TmXoKXfVivigwYZ5DxfprAhViHk-1F6_/view?usp=sharing
+
 ### AI-Powered Safety and Support Platform for Female University Students
 
 ---
@@ -212,21 +224,11 @@ By integrating Artificial Intelligence with practical safety tools, CampusSafeHe
 
 ---
 
-## Deployment
 
-### Frontend
-
-(Add Vercel Deployment URL)
-
-### Backend
-
-(Add Render Deployment URL)
-
----
 
 ## GitHub Repository
 
-(Add GitHub Repository URL)
+https://github.com/WaraniLakma/CampusSafeHer.git
 
 ---
 
