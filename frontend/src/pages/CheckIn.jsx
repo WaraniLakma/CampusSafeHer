@@ -1,42 +1,64 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import logo from "../assets/logo.webp";
-import dashboardBg from "../assets/dashboard-bg.png";
-
-const navLinkStyle = {
-  padding: "14px 16px",
-  borderRadius: "12px",
-  cursor: "pointer",
-  color: "#555",
-  fontWeight: "500",
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  transition: "all 0.2s ease",
-};
-
-const activeNavStyle = {
-  ...navLinkStyle,
-  color: "#ec4899",
-  fontWeight: "600",
-  backgroundColor: "#fdf2f8",
-};
+import DashboardLayout from "../components/DashboardLayout";
 
 function getStatusBadge(status) {
   const configs = {
-    Active: { bg: "#dcfce7", color: "#15803d", label: "🟢 Active", desc: "Awaiting expected arrival time." },
-    "First Reminder Sent": { bg: "#fef9c3", color: "#a16207", label: "🟡 1st Reminder", desc: "Please complete your check-in if you have arrived safely." },
-    "Second Reminder Sent": { bg: "#fef9c3", color: "#a16207", label: "🟡 2nd Reminder", desc: "Please complete your check-in if you have arrived safely." },
-    Overdue: { bg: "#ffedd5", color: "#c2410c", label: "🟠 Last Reminder", desc: "After 5 seconds, trusted contacts will be notified." },
-    "Alert Sent": { bg: "#fee2e2", color: "#b91c1c", label: "🔴 Alert Sent", desc: "Trusted contacts have been notified." },
-    "Safe Confirmed": { bg: "#dcfce7", color: "#15803d", label: "✅ Safety Confirmed", desc: "Trusted contacts will be notified that you arrived safely." },
+    Active: {
+      bg: "#dcfce7",
+      color: "#15803d",
+      border: "#86efac",
+      label: "🟢 Active Journey",
+      desc: "Awaiting your safe arrival at expected time.",
+    },
+    "First Reminder Sent": {
+      bg: "#fef9c3",
+      color: "#a16207",
+      border: "#fde047",
+      label: "🟡 1st Reminder",
+      desc: "Expected time passed. Confirm your safety if you have arrived.",
+    },
+    "Second Reminder Sent": {
+      bg: "#fef9c3",
+      color: "#a16207",
+      border: "#fde047",
+      label: "🟡 2nd Reminder",
+      desc: "Please complete your check-in immediately.",
+    },
+    Overdue: {
+      bg: "#ffedd5",
+      color: "#c2410c",
+      border: "#fdba74",
+      label: "🟠 Urgent Reminder",
+      desc: "Trusted contacts will be notified in 5 seconds if unconfirmed.",
+    },
+    "Alert Sent": {
+      bg: "#fee2e2",
+      color: "#b91c1c",
+      border: "#fca5a5",
+      label: "🔴 Emergency Alert Sent",
+      desc: "Trusted contacts have been notified with your GPS coordinates.",
+    },
+    "Safe Confirmed": {
+      bg: "#dcfce7",
+      color: "#15803d",
+      border: "#86efac",
+      label: "✅ Safety Confirmed",
+      desc: "Safe arrival confirmed. Trusted contacts have been updated.",
+    },
   };
-  return configs[status] || { bg: "#f1f5f9", color: "#475569", label: status, desc: "" };
+  return (
+    configs[status] || {
+      bg: "#f1f5f9",
+      color: "#475569",
+      border: "#cbd5e1",
+      label: status,
+      desc: "",
+    }
+  );
 }
 
 function CheckIn() {
-  const navigate = useNavigate();
   const [checkIns, setCheckIns] = useState([]);
   const [destination, setDestination] = useState("");
   const [expectedArrivalTime, setExpectedArrivalTime] = useState("");
@@ -46,47 +68,19 @@ function CheckIn() {
   const [currentLongitude, setCurrentLongitude] = useState(null);
 
   const [user, setUser] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
   const [toast, setToast] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchUser();
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
-    if ("Notification" in window) {
-      Notification.requestPermission();
+  const showNotification = (title, body) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(title, { body });
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCurrentLatitude(position.coords.latitude);
-        setCurrentLongitude(position.coords.longitude);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-
-    fetchCheckIns();
-
-    const interval = setInterval(() => {
-      fetchCheckIns();
-    }, 5000);
-
-    const locationInterval = setInterval(() => {
-      checkIns.forEach((checkIn) => {
-        if (!checkIn.checkedIn && checkIn.status !== "Alert Sent") {
-          updateLocation(checkIn._id);
-        }
-      });
-    }, 30000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(locationInterval);
-    };
-  }, []);
+  };
 
   const fetchUser = async () => {
     try {
@@ -100,17 +94,6 @@ function CheckIn() {
     }
   };
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
-  };
-
-  const showNotification = (title, body) => {
-    if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, { body });
-    }
-  };
-
   const fetchCheckIns = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -119,9 +102,9 @@ function CheckIn() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setCheckIns(res.data.checkIns);
+      setCheckIns(res.data.checkIns || []);
 
-      res.data.checkIns.forEach((checkIn) => {
+      res.data.checkIns?.forEach((checkIn) => {
         const notificationKey = `${checkIn._id}-${checkIn.status}`;
 
         if (localStorage.getItem(notificationKey)) {
@@ -171,6 +154,43 @@ function CheckIn() {
     });
   };
 
+  useEffect(() => {
+    fetchUser();
+
+    if ("Notification" in window) {
+      Notification.requestPermission();
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentLatitude(position.coords.latitude);
+        setCurrentLongitude(position.coords.longitude);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    fetchCheckIns();
+
+    const interval = setInterval(() => {
+      fetchCheckIns();
+    }, 5000);
+
+    const locationInterval = setInterval(() => {
+      checkIns.forEach((checkIn) => {
+        if (!checkIn.checkedIn && checkIn.status !== "Alert Sent") {
+          updateLocation(checkIn._id);
+        }
+      });
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(locationInterval);
+    };
+  }, []);
+
   const createCheckIn = async (e) => {
     e.preventDefault();
 
@@ -185,7 +205,13 @@ function CheckIn() {
 
       await API.post(
         "/checkins",
-        { destination, expectedArrivalTime: new Date(expectedArrivalTime), reminderInterval, currentLatitude, currentLongitude },
+        {
+          destination,
+          expectedArrivalTime: new Date(expectedArrivalTime),
+          reminderInterval,
+          currentLatitude,
+          currentLongitude,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -205,7 +231,7 @@ function CheckIn() {
     try {
       const token = localStorage.getItem("token");
       await API.patch(`/checkins/${id}`, {}, { headers: { Authorization: `Bearer ${token}` } });
-      showNotification("✅ Safety Confirmed", "Trusted contacts will be notified that you arrived safely.");
+      showNotification("✅ Safety Confirmed", "Trusted contacts have been notified that you arrived safely.");
       showToast("Safety confirmed! Trusted contacts have been notified.", "success");
       fetchCheckIns();
     } catch (error) {
@@ -231,544 +257,476 @@ function CheckIn() {
   );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg,#fff1f8,#fff7fd)",
-        fontFamily: "var(--sans)",
-        color: "#1f1147",
-        position: "relative",
-      }}
+    <DashboardLayout
+      activeKey="checkins"
+      pageTitle="Safety Check-Ins"
+      pageSubtitle="Automated arrival timers & alerts"
+      user={user}
+      toast={toast}
+      onDismissToast={() => setToast(null)}
     >
       <style>{`
-        .checkin-grid-card {
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        .checkin-card-modern {
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .checkin-grid-card:hover {
+        .checkin-card-modern:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(31, 17, 71, 0.08) !important;
-        }
-        .btn-interact {
-          transition: all 0.2s ease;
-        }
-        .btn-interact:hover {
-          filter: brightness(1.05);
-          transform: translateY(-1px);
-        }
-        .btn-interact:active {
-          transform: translateY(0);
-        }
-        .input-field {
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .input-field:focus {
-          border-color: #ec4899 !important;
-          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+          box-shadow: 0 14px 30px rgba(31, 17, 71, 0.08) !important;
         }
       `}</style>
 
-      {toast && (
+      {/* EMERGENCY HIGH-PRIORITY ALERT BANNER */}
+      {showAlertBanner && (
         <div
           style={{
-            position: "fixed",
-            bottom: "30px",
-            right: "30px",
-            backgroundColor: toast.type === "success" ? "#10b981" : "#ef4444",
-            color: "white",
-            padding: "16px 24px",
-            borderRadius: "12px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-            zIndex: 9999,
+            backgroundColor: "#fef2f2",
+            border: "2px solid #ef4444",
+            padding: "20px 24px",
+            marginBottom: "28px",
+            borderRadius: "20px",
+            boxShadow: "0 10px 25px rgba(239, 68, 68, 0.15)",
             display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            fontWeight: "bold",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "20px",
           }}
         >
-          <span>{toast.type === "success" ? "✅" : "⚠️"}</span>
-          <span>{toast.message}</span>
+          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+            <span style={{ fontSize: "32px", lineHeight: "1" }}>🚨</span>
+            <div>
+              <h2
+                style={{
+                  margin: "0 0 6px",
+                  color: "#991b1b",
+                  fontSize: "19px",
+                  fontWeight: "800",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
+                Overdue Check-In Alert Broadcasted
+              </h2>
+              <p style={{ margin: "0 0 4px", color: "#b91c1c", fontWeight: "600", fontSize: "14px" }}>
+                Trusted contacts have received an alert with your last reported GPS coordinates.
+              </p>
+              <p style={{ margin: 0, color: "#64748b", fontSize: "13.5px" }}>
+                If you have arrived safely, click <strong>"Complete Check-In"</strong> below immediately to notify them of your safety.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowAlertBanner(false)}
+            style={{
+              border: "none",
+              backgroundColor: "#fee2e2",
+              color: "#dc2626",
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "bold",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
-      {/* SIDEBAR */}
-      <div
-        style={{
-          width: showSidebar ? "260px" : "0",
-          backgroundColor: "white",
-          borderRight: showSidebar ? "1px solid #f3d4e7" : "none",
-          padding: showSidebar ? "25px" : "0",
-          overflow: "hidden",
-          transition: "width 0.3s ease, padding 0.3s ease",
-          boxShadow: showSidebar ? "4px 0 20px rgba(31, 17, 71, 0.04)" : "none",
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 100,
-        }}
-      >
-        <div
+      {/* HEADER HERO */}
+      <div style={{ marginBottom: "28px" }}>
+        <h1
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
-            cursor: "pointer",
-            paddingBottom: "15px",
-            borderBottom: "1px solid #fdf2f8",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(1.8rem, 3.2vw, 2.3rem)",
+            color: "#1f1147",
+            fontWeight: "800",
+            margin: "0 0 6px",
           }}
-          onClick={() => navigate("/dashboard")}
         >
-          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
-          <h3 style={{ color: "#1f1147", margin: 0, fontWeight: "700", letterSpacing: "-0.5px" }}>
-            CampusSafe<span style={{ color: "#ec4899" }}>Her</span>
-          </h3>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
-          {[
-            { path: "/dashboard", icon: "🏠", label: "Dashboard" },
-            { path: "/contacts", icon: "👥", label: "Trusted Contacts" },
-            { path: "/incidents", icon: "📝", label: "Report Incident" },
-            { path: "/checkins", icon: "📍", label: "Check-Ins", active: true },
-            { path: "/alerts", icon: "🔔", label: "Safety Alerts" },
-            { path: "/ai", icon: "🤖", label: "AI Safety Chat" },
-          ].map((item) => (
-            <span
-              key={item.path}
-              onClick={() => !item.active && navigate(item.path)}
-              style={item.active ? activeNavStyle : navLinkStyle}
-              onMouseEnter={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "#fdf2f8";
-                  e.currentTarget.style.color = "#ec4899";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#555";
-                }
-              }}
-            >
-              {item.icon} {item.label}
-            </span>
-          ))}
-        </div>
-
-        <div style={{ paddingTop: "20px", borderTop: "1px solid #f3d4e7" }}>
-          <span
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/login");
-            }}
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#ef4444",
-              fontWeight: "500",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fef2f2")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-          >
-            🚪 Logout
-          </span>
-        </div>
+          Journey Safety Check-Ins
+        </h1>
+        <p style={{ color: "#64748b", fontSize: "15px", margin: 0 }}>
+          Heading to the library, returning to your hostel, or walking across campus at night? Set a safety timer.
+          If you don't check in by your expected arrival, your trusted circle is notified automatically.
+        </p>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* TWO-COLUMN GRID: FORM LEFT, CHECK-IN HISTORY RIGHT */}
       <div
         style={{
-          flex: 1,
-          padding: "30px",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          backgroundImage: `url(${dashboardBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center right",
-          backgroundRepeat: "no-repeat",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+          gap: "32px",
+          alignItems: "start",
         }}
       >
-        {/* TOP BAR */}
+        {/* LEFT: CREATE NEW CHECK-IN FORM */}
         <div
           style={{
             backgroundColor: "white",
-            borderRadius: "20px",
-            padding: "15px 30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 4px 15px rgba(31, 17, 71, 0.03)",
-            marginBottom: "35px",
+            borderRadius: "24px",
+            padding: "32px",
+            boxShadow: "0 10px 30px rgba(31, 17, 71, 0.04)",
+            border: "1px solid #f3d4e7",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span
-              onClick={() => setShowSidebar(!showSidebar)}
-              style={{ fontSize: "24px", cursor: "pointer", color: "#1f1147", padding: "5px" }}
-            >
-              ☰
-            </span>
-            <h4 style={{ margin: 0, color: "#6b6375", fontWeight: "500" }}>
-              Safety Check-In Center
-            </h4>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "15px", position: "relative" }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontWeight: "600", color: "#1f1147", fontSize: "15px" }}>
-                {user?.name || "Student User"}
-              </div>
-              <div style={{ fontSize: "12px", color: "#ec4899", fontWeight: "600" }}>
-                Active Profile
-              </div>
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "22px" }}>
             <div
-              onClick={() => setShowProfile(!showProfile)}
               style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
-                color: "white",
+                width: "44px",
+                height: "44px",
+                borderRadius: "14px",
+                backgroundColor: "#fdf2f8",
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                fontWeight: "bold",
-                cursor: "pointer",
-                boxShadow: "0 3px 10px rgba(236,72,153,0.2)",
+                justifyContent: "center",
+                fontSize: "22px",
               }}
             >
-              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              📍
             </div>
-            {showProfile && (
-              <div
+            <div>
+              <h2
                 style={{
-                  position: "absolute",
-                  top: "60px",
-                  right: "0",
-                  backgroundColor: "white",
-                  padding: "20px",
-                  borderRadius: "15px",
-                  boxShadow: "0 10px 25px rgba(31, 17, 71, 0.12)",
-                  minWidth: "220px",
-                  textAlign: "center",
-                  zIndex: 1000,
-                  border: "1px solid #f3d4e7",
+                  fontFamily: "var(--font-display)",
+                  margin: 0,
+                  fontSize: "20px",
+                  fontWeight: "700",
+                  color: "#1f1147",
                 }}
               >
-                <h3 style={{ margin: "0 0 5px", color: "#1f1147", fontSize: "16px" }}>{user?.name}</h3>
-                <p style={{ fontSize: "13px", color: "#666", margin: "0 0 15px" }}>{user?.email}</p>
-                <button
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    navigate("/login");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    border: "none",
-                    background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
+                Start New Check-In
+              </h2>
+              <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
+                Active GPS coordinates will accompany your trip
+              </p>
+            </div>
           </div>
+
+          <form onSubmit={createCheckIn} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {/* DESTINATION */}
+            <div>
+              <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "600", color: "#334155" }}>
+                Destination
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Science Library, Dormitory 4B, Main Campus Gate"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                required
+                className="modern-input"
+              />
+            </div>
+
+            {/* EXPECTED ARRIVAL TIME */}
+            <div>
+              <label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: "600", color: "#334155" }}>
+                Expected Arrival Time
+              </label>
+              <input
+                type="datetime-local"
+                value={expectedArrivalTime}
+                onChange={(e) => setExpectedArrivalTime(e.target.value)}
+                required
+                className="modern-input"
+              />
+            </div>
+
+            {/* REMINDER INTERVAL */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>
+                  Reminder Interval (Seconds)
+                </label>
+                <span style={{ fontSize: "12.5px", color: "#7c3aed", fontWeight: "700" }}>
+                  Every {reminderInterval}s
+                </span>
+              </div>
+
+              {/* QUICK INTERVAL PRESET PILLS */}
+              <div style={{ display: "flex", gap: "8px", marginBottom: "10px" }}>
+                {[5, 10, 30, 60].map((sec) => (
+                  <button
+                    key={sec}
+                    type="button"
+                    onClick={() => setReminderInterval(sec)}
+                    style={{
+                      flex: 1,
+                      padding: "8px",
+                      borderRadius: "10px",
+                      border: reminderInterval === sec ? "2px solid #8b5cf6" : "1px solid #cbd5e1",
+                      backgroundColor: reminderInterval === sec ? "#f5f3ff" : "white",
+                      color: reminderInterval === sec ? "#7c3aed" : "#475569",
+                      fontWeight: "700",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
+
+              <input
+                type="number"
+                min="1"
+                max="60"
+                value={reminderInterval}
+                onChange={(e) => setReminderInterval(Number(e.target.value))}
+                className="modern-input"
+              />
+            </div>
+
+            {/* GPS STATUS CALLOUT */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "12px 16px",
+                borderRadius: "12px",
+                backgroundColor: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                fontSize: "13px",
+                color: "#166534",
+              }}
+            >
+              <span>🛰️</span>
+              <span>
+                {currentLatitude && currentLongitude
+                  ? `GPS coordinates tracked (${currentLatitude.toFixed(3)}, ${currentLongitude.toFixed(3)})`
+                  : "GPS location active & monitored"}
+              </span>
+            </div>
+
+            {/* SUBMIT BUTTON */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary"
+              style={{
+                width: "100%",
+                padding: "16px",
+                borderRadius: "14px",
+                fontSize: "15.5px",
+                fontWeight: "700",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                opacity: isSubmitting ? 0.75 : 1,
+              }}
+            >
+              {isSubmitting ? "Activating Check-In..." : "📍 Activate Check-In"}
+            </button>
+          </form>
         </div>
 
-        {showAlertBanner && (
-          <div
-            style={{
-              backgroundColor: "white",
-              border: "2px solid #ec4899",
-              padding: "25px 30px",
-              marginBottom: "30px",
-              borderRadius: "20px",
-              boxShadow: "0 8px 20px rgba(236,72,153,0.15)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: "20px",
-            }}
-          >
-            <div>
-              <h2 style={{ margin: "0 0 10px", color: "#b91c1c", fontSize: "20px" }}>🚨 Safety Alert</h2>
-              <p style={{ margin: "0 0 6px", color: "#1f1147" }}>Trusted contacts have been notified.</p>
-              <p style={{ margin: "0 0 6px", color: "#6b6375", fontSize: "14px" }}>Last known location shared.</p>
-              <p style={{ margin: 0, color: "#6b6375", fontSize: "14px" }}>
-                If you have arrived safely, please complete your check-in.
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAlertBanner(false)}
-              className="btn-interact"
+        {/* RIGHT: CHECK-INS LIST */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <h2
               style={{
-                border: "none",
-                backgroundColor: "#fdf2f8",
-                color: "#ec4899",
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                cursor: "pointer",
-                fontSize: "16px",
-                flexShrink: 0,
+                fontFamily: "var(--font-display)",
+                margin: "0 0 4px",
+                fontSize: "20px",
+                fontWeight: "700",
+                color: "#1f1147",
               }}
             >
-              ✕
-            </button>
-          </div>
-        )}
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-            gap: "35px",
-            alignItems: "start",
-          }}
-        >
-          {/* FORM CARD */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "20px",
-              padding: "30px",
-              boxShadow: "0 4px 25px rgba(31, 17, 71, 0.02)",
-              border: "1px solid #f3d4e7",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "25px" }}>
-              <span style={{ fontSize: "28px" }}>📍</span>
-              <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "700", color: "#1f1147" }}>
-                New Check-In
-              </h2>
-            </div>
-            <p style={{ fontSize: "14px", color: "#6b6375", margin: "0 0 25px" }}>
-              Set your destination and expected arrival time. We'll remind you to confirm your safety, and alert trusted contacts if you don't check in.
+              Your Safety Check-Ins ({sortedCheckIns.length})
+            </h2>
+            <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
+              Monitor active timers and completed safe arrivals
             </p>
-
-            <form onSubmit={createCheckIn} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>Destination</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Library, Dorm Room B"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className="input-field"
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "15px",
-                    outline: "none",
-                  }}
-                  required
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>
-                  Expected Arrival Time
-                </label>
-                <input
-                  type="datetime-local"
-                  value={expectedArrivalTime}
-                  onChange={(e) => setExpectedArrivalTime(e.target.value)}
-                  className="input-field"
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "15px",
-                    outline: "none",
-                  }}
-                  required
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "14px", fontWeight: "600", color: "#475569" }}>
-                  Reminder Interval (seconds)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="60"
-                  value={reminderInterval}
-                  onChange={(e) => setReminderInterval(Number(e.target.value))}
-                  className="input-field"
-                  style={{
-                    padding: "14px",
-                    borderRadius: "12px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "15px",
-                    outline: "none",
-                  }}
-                />
-                <p style={{ margin: 0, fontSize: "13px", color: "#6b6375" }}>
-                  Reminders every {reminderInterval} second(s)
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-interact"
-                style={{
-                  width: "100%",
-                  padding: "16px",
-                  borderRadius: "12px",
-                  border: "none",
-                  background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                  color: "white",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  cursor: isSubmitting ? "not-allowed" : "pointer",
-                  boxShadow: "0 4px 15px rgba(236,72,153,0.25)",
-                  marginTop: "10px",
-                }}
-              >
-                {isSubmitting ? "Creating..." : "📍 Create Check-In"}
-              </button>
-            </form>
           </div>
 
-          {/* CHECK-IN HISTORY */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
-            <div>
-              <h2 style={{ margin: "0 0 5px", fontSize: "22px", fontWeight: "700", color: "#1f1147" }}>
-                Your Check-Ins ({sortedCheckIns.length})
-              </h2>
-              <p style={{ margin: 0, color: "#6b6375", fontSize: "14px" }}>
-                Track active and past safety check-ins.
-              </p>
-            </div>
-
-            {sortedCheckIns.length === 0 ? (
+          {sortedCheckIns.length === 0 ? (
+            /* EMPTY STATE */
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "24px",
+                padding: "60px 30px",
+                textAlign: "center",
+                border: "1px solid #f3d4e7",
+                boxShadow: "0 10px 30px rgba(31, 17, 71, 0.03)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "14px",
+              }}
+            >
               <div
                 style={{
-                  backgroundColor: "white",
-                  borderRadius: "20px",
-                  padding: "60px 40px",
-                  textAlign: "center",
-                  border: "1px solid #f3d4e7",
+                  width: "72px",
+                  height: "72px",
+                  borderRadius: "24px",
+                  backgroundColor: "#fdf2f8",
                   display: "flex",
-                  flexDirection: "column",
                   alignItems: "center",
-                  gap: "15px",
+                  justifyContent: "center",
+                  fontSize: "36px",
                 }}
               >
-                <div style={{ fontSize: "50px" }}>📍</div>
-                <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600", color: "#1f1147" }}>
-                  No check-ins yet
-                </h3>
-                <p style={{ margin: 0, color: "#6b6375", maxWidth: "320px", fontSize: "14px" }}>
-                  Create a check-in when heading somewhere so your trusted contacts know you're safe.
-                </p>
+                📍
               </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {sortedCheckIns.map((checkIn) => {
-                  const badge = getStatusBadge(checkIn.status);
-                  return (
-                    <div
-                      key={checkIn._id}
-                      className="checkin-grid-card"
-                      style={{
-                        backgroundColor: "white",
-                        borderRadius: "20px",
-                        padding: "24px",
-                        boxShadow: "0 4px 15px rgba(31, 17, 71, 0.01)",
-                        border: "1px solid #f3d4e7",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", marginBottom: "12px" }}>
-                        <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#1f1147" }}>
+              <h3
+                style={{
+                  fontFamily: "var(--font-display)",
+                  margin: 0,
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  color: "#1f1147",
+                }}
+              >
+                No active check-ins
+              </h3>
+              <p style={{ margin: 0, color: "#64748b", maxWidth: "340px", fontSize: "14px", lineHeight: "1.6" }}>
+                Create a check-in when heading somewhere on campus. Your trusted contacts will know you arrived safely.
+              </p>
+            </div>
+          ) : (
+            /* LIST OF CHECK-IN CARDS */
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {sortedCheckIns.map((checkIn) => {
+                const badge = getStatusBadge(checkIn.status);
+                const isOverdueOrAlert =
+                  checkIn.status === "Overdue" || checkIn.status === "Alert Sent";
+
+                return (
+                  <div
+                    key={checkIn._id}
+                    className="checkin-card-modern"
+                    style={{
+                      backgroundColor: "white",
+                      borderRadius: "22px",
+                      padding: "24px",
+                      boxShadow: "0 6px 20px rgba(31, 17, 71, 0.03)",
+                      border: `1.5px solid ${badge.border || "#f3d4e7"}`,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                      position: "relative",
+                    }}
+                  >
+                    {/* CARD HEADER */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ fontSize: "22px" }}>📍</span>
+                        <h3
+                          style={{
+                            margin: 0,
+                            fontSize: "18px",
+                            fontWeight: "800",
+                            color: "#1f1147",
+                            fontFamily: "var(--font-display)",
+                          }}
+                        >
                           {checkIn.destination}
                         </h3>
-                        <span
-                          style={{
-                            backgroundColor: badge.bg,
-                            color: badge.color,
-                            padding: "4px 12px",
-                            borderRadius: "20px",
-                            fontSize: "11px",
-                            fontWeight: "bold",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {badge.label}
-                        </span>
                       </div>
 
-                      <p style={{ margin: "0 0 6px", fontSize: "14px", color: "#64748b" }}>
-                        🕐 Expected: {new Date(checkIn.expectedArrivalTime).toLocaleString("en-LK", {
-                            })}
-                      </p>
-                      {badge.desc && (
-                        <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#6b6375" }}>{badge.desc}</p>
-                      )}
-                      <p style={{ margin: "0 0 16px", fontSize: "13px", color: "#94a3b8" }}>
-                        Checked in: {checkIn.checkedIn ? "Yes ✅" : "No"}
-                      </p>
+                      <span
+                        style={{
+                          backgroundColor: badge.bg,
+                          color: badge.color,
+                          border: `1px solid ${badge.border}`,
+                          padding: "4px 12px",
+                          borderRadius: "20px",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {badge.label}
+                      </span>
+                    </div>
 
-                      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                        {!checkIn.checkedIn && (
-                          <button
-                            onClick={() => completeCheckIn(checkIn._id)}
-                            className="btn-interact"
-                            style={{
-                              padding: "10px 18px",
-                              borderRadius: "10px",
-                              border: "none",
-                              background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                              color: "white",
-                              fontWeight: "600",
-                              fontSize: "14px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            ✅ Complete Check-In
-                          </button>
-                        )}
+                    {/* EXPECTED TIME & STATUS DESC */}
+                    <div style={{ fontSize: "13.5px", color: "#475569" }}>
+                      🕐 <strong>Expected:</strong>{" "}
+                      {new Date(checkIn.expectedArrivalTime).toLocaleString()}
+                    </div>
+
+                    {badge.desc && (
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: isOverdueOrAlert ? "#991b1b" : "#475569",
+                          backgroundColor: isOverdueOrAlert ? "#fef2f2" : "#f8fafc",
+                          padding: "8px 14px",
+                          borderRadius: "10px",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        {badge.desc}
+                      </div>
+                    )}
+
+                    {/* ACTION BUTTONS */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        marginTop: "8px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {!checkIn.checkedIn && (
                         <button
-                          onClick={() => deleteCheckIn(checkIn._id)}
-                          className="btn-interact"
+                          onClick={() => completeCheckIn(checkIn._id)}
                           style={{
-                            padding: "10px 18px",
-                            borderRadius: "10px",
-                            border: "1px solid #fecaca",
-                            backgroundColor: "#fef2f2",
-                            color: "#ef4444",
-                            fontWeight: "600",
+                            padding: "10px 20px",
+                            borderRadius: "12px",
+                            border: "none",
+                            background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                            color: "white",
+                            fontWeight: "700",
                             fontSize: "14px",
                             cursor: "pointer",
+                            boxShadow: "0 4px 14px rgba(16, 185, 129, 0.28)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
                           }}
                         >
-                          🗑 Delete
+                          <span>✅ I've Arrived Safely</span>
                         </button>
-                      </div>
+                      )}
+
+                      <button
+                        onClick={() => deleteCheckIn(checkIn._id)}
+                        style={{
+                          padding: "10px 18px",
+                          borderRadius: "12px",
+                          border: "1px solid #fecaca",
+                          backgroundColor: "#fef2f2",
+                          color: "#dc2626",
+                          fontWeight: "600",
+                          fontSize: "13.5px",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <span>🗑 Delete</span>
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

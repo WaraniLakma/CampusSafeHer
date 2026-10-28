@@ -1,48 +1,40 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import logo from "../assets/logo.webp";
-import dashboardBg from "../assets/dashboard-bg.png";
-
-const navLinkStyle = {
-  padding: "14px 16px",
-  borderRadius: "12px",
-  cursor: "pointer",
-  color: "#555",
-  fontWeight: "500",
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  transition: "all 0.2s ease",
-};
-
-const activeNavStyle = {
-  ...navLinkStyle,
-  color: "#ec4899",
-  fontWeight: "600",
-  backgroundColor: "#fdf2f8",
-};
+import DashboardLayout from "../components/DashboardLayout";
 
 const SUGGESTED_PROMPTS = [
-  { icon: "📄", label: "Complaint Letter", text: "Generate a complaint letter to university administration." },
-  { icon: "🚨", label: "Emergency Advice", text: "What should I do during a campus emergency?" },
-  { icon: "🏠", label: "Hostel Safety", text: "Give me hostel safety tips." },
-  { icon: "🚶", label: "Travel Safety", text: "Give me safe travel advice." },
+  {
+    icon: "📄",
+    label: "Draft Complaint Letter",
+    desc: "Formal letter to university administration",
+    text: "Generate a formal complaint letter to university administration regarding a campus safety concern.",
+  },
+  {
+    icon: "🚨",
+    label: "Emergency Protocol",
+    desc: "Steps to take during distress or threat",
+    text: "What immediate steps should I take if I feel threatened on campus at night?",
+  },
+  {
+    icon: "🏠",
+    label: "Hostel & Room Safety",
+    desc: "Best practices for residential security",
+    text: "Give me the most essential hostel and dormitory safety tips for female students.",
+  },
+  {
+    icon: "🚶‍♀️",
+    label: "Late-Night Travel Guide",
+    desc: "Commute vigilance and route precautions",
+    text: "Give me practical travel advice when walking or commuting late around campus.",
+  },
 ];
 
 function AIChat() {
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
   const [toast, setToast] = useState(null);
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   const fetchUser = async () => {
     try {
@@ -56,13 +48,19 @@ function AIChat() {
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   const showToast = (msg, type = "success") => {
     setToast({ message: msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
-  const askAI = async () => {
-    if (!message.trim()) {
+  const askAI = async (customMessage) => {
+    const query = typeof customMessage === "string" ? customMessage : message;
+
+    if (!query.trim()) {
       showToast("Please enter a question first.", "error");
       return;
     }
@@ -72,14 +70,14 @@ function AIChat() {
       const token = localStorage.getItem("token");
       const res = await API.post(
         "/ai/chat",
-        { message },
+        { message: query },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setReply(res.data.reply);
     } catch (error) {
       console.log(error);
-      setReply("Failed to get response. Please try again.");
-      showToast("Failed to get AI response.", "error");
+      setReply("I was unable to connect to the safety AI service. Please verify your connection and try again.");
+      showToast("Failed to retrieve AI response.", "error");
     } finally {
       setLoading(false);
     }
@@ -93,6 +91,7 @@ function AIChat() {
   };
 
   const copyResponse = () => {
+    if (!reply) return;
     navigator.clipboard.writeText(reply);
     showToast("Response copied to clipboard!", "success");
   };
@@ -103,494 +102,344 @@ function AIChat() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg,#fff1f8,#fff7fd)",
-        fontFamily: "var(--sans)",
-        color: "#1f1147",
-        position: "relative",
-      }}
+    <DashboardLayout
+      activeKey="ai"
+      pageTitle="AI Safety Assistant"
+      pageSubtitle="24/7 intelligent campus protection & advice"
+      user={user}
+      toast={toast}
+      onDismissToast={() => setToast(null)}
     >
       <style>{`
-        .btn-interact {
-          transition: all 0.2s ease;
+        .prompt-chip-card {
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .btn-interact:hover:not(:disabled) {
-          filter: brightness(1.05);
-          transform: translateY(-1px);
-        }
-        .btn-interact:active:not(:disabled) {
-          transform: translateY(0);
-        }
-        .input-field {
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .input-field:focus {
-          border-color: #ec4899 !important;
-          box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-        }
-        .prompt-chip {
-          transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        .prompt-chip:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(31, 17, 71, 0.08);
+        .prompt-chip-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 26px rgba(31, 17, 71, 0.08) !important;
           border-color: #ec4899 !important;
         }
       `}</style>
 
-      {toast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "30px",
-            right: "30px",
-            backgroundColor: toast.type === "success" ? "#10b981" : "#ef4444",
-            color: "white",
-            padding: "16px 24px",
-            borderRadius: "12px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            fontWeight: "bold",
-          }}
-        >
-          <span>{toast.type === "success" ? "✅" : "⚠️"}</span>
-          <span>{toast.message}</span>
-        </div>
-      )}
-
-      {/* SIDEBAR */}
+      {/* HEADER HERO BANNER */}
       <div
         style={{
-          width: showSidebar ? "260px" : "0",
-          backgroundColor: "white",
-          borderRight: showSidebar ? "1px solid #f3d4e7" : "none",
-          padding: showSidebar ? "25px" : "0",
-          overflow: "hidden",
-          transition: "width 0.3s ease, padding 0.3s ease",
-          boxShadow: showSidebar ? "4px 0 20px rgba(31, 17, 71, 0.04)" : "none",
+          background: "linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)",
+          borderRadius: "28px",
+          padding: "36px 40px",
+          color: "white",
+          boxShadow: "0 14px 35px rgba(139, 92, 246, 0.25)",
+          marginBottom: "32px",
           display: "flex",
-          flexDirection: "column",
-          zIndex: 100,
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "24px",
         }}
       >
+        <div style={{ maxWidth: "680px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "rgba(255,255,255,0.2)", padding: "4px 14px", borderRadius: "20px", fontSize: "12px", fontWeight: "700", marginBottom: "12px" }}>
+            <span>🤖</span>
+            <span>Intelligent Campus Companion</span>
+          </div>
+
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(1.9rem, 3.4vw, 2.4rem)",
+              fontWeight: "800",
+              margin: "0 0 10px",
+              lineHeight: "1.2",
+            }}
+          >
+            Your AI Campus Safety Guardian
+          </h1>
+
+          <p
+            style={{
+              margin: 0,
+              fontSize: "15.5px",
+              color: "rgba(255, 255, 255, 0.92)",
+              lineHeight: "1.6",
+            }}
+          >
+            Ask questions about emergency actions, generate official administration complaint letters, or receive safety advice for late-night travel and hostel security.
+          </p>
+        </div>
+
         <div
           style={{
+            width: "80px",
+            height: "80px",
+            borderRadius: "24px",
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
-            cursor: "pointer",
-            paddingBottom: "15px",
-            borderBottom: "1px solid #fdf2f8",
+            justifyContent: "center",
+            fontSize: "44px",
+            flexShrink: 0,
           }}
-          onClick={() => navigate("/dashboard")}
         >
-          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
-          <h3 style={{ color: "#1f1147", margin: 0, fontWeight: "700", letterSpacing: "-0.5px" }}>
-            CampusSafe<span style={{ color: "#ec4899" }}>Her</span>
-          </h3>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
-          {[
-            { path: "/dashboard", icon: "🏠", label: "Dashboard" },
-            { path: "/contacts", icon: "👥", label: "Trusted Contacts" },
-            { path: "/incidents", icon: "📝", label: "Report Incident" },
-            { path: "/checkins", icon: "📍", label: "Check-Ins" },
-            { path: "/alerts", icon: "🔔", label: "Safety Alerts" },
-            { path: "/ai", icon: "🤖", label: "AI Safety Chat", active: true },
-          ].map((item) => (
-            <span
-              key={item.path}
-              onClick={() => !item.active && navigate(item.path)}
-              style={item.active ? activeNavStyle : navLinkStyle}
-              onMouseEnter={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "#fdf2f8";
-                  e.currentTarget.style.color = "#ec4899";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#555";
-                }
-              }}
-            >
-              {item.icon} {item.label}
-            </span>
-          ))}
-        </div>
-
-        <div style={{ paddingTop: "20px", borderTop: "1px solid #f3d4e7" }}>
-          <span
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/login");
-            }}
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#ef4444",
-              fontWeight: "500",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fef2f2")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-          >
-            🚪 Logout
-          </span>
+          💡
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div
-        style={{
-          flex: 1,
-          padding: "30px",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          backgroundImage: `url(${dashboardBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center right",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* TOP BAR */}
-        <div
+      {/* QUICK PROMPT CHIPS */}
+      <div style={{ marginBottom: "32px" }}>
+        <h2
           style={{
-            backgroundColor: "white",
-            borderRadius: "20px",
-            padding: "15px 30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 4px 15px rgba(31, 17, 71, 0.03)",
-            marginBottom: "35px",
+            fontFamily: "var(--font-display)",
+            fontSize: "18px",
+            fontWeight: "700",
+            color: "#1f1147",
+            margin: "0 0 16px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span
-              onClick={() => setShowSidebar(!showSidebar)}
-              style={{ fontSize: "24px", cursor: "pointer", color: "#1f1147", padding: "5px" }}
-            >
-              ☰
-            </span>
-            <h4 style={{ margin: 0, color: "#6b6375", fontWeight: "500" }}>
-              AI Safety Assistant
-            </h4>
-          </div>
+          Recommended Prompts
+        </h2>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "15px", position: "relative" }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontWeight: "600", color: "#1f1147", fontSize: "15px" }}>
-                {user?.name || "Student User"}
-              </div>
-              <div style={{ fontSize: "12px", color: "#ec4899", fontWeight: "600" }}>
-                Active Profile
-              </div>
-            </div>
-            <div
-              onClick={() => setShowProfile(!showProfile)}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "16px",
+          }}
+        >
+          {SUGGESTED_PROMPTS.map((prompt) => (
+            <button
+              key={prompt.label}
+              onClick={() => {
+                setMessage(prompt.text);
+                askAI(prompt.text);
+              }}
+              className="prompt-chip-card"
               style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
-                color: "white",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                fontWeight: "bold",
+                backgroundColor: "white",
+                border: "1.5px solid #f3d4e7",
+                borderRadius: "20px",
+                padding: "20px",
+                textAlign: "left",
                 cursor: "pointer",
-                boxShadow: "0 3px 10px rgba(236,72,153,0.2)",
+                boxShadow: "0 4px 15px rgba(31, 17, 71, 0.03)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
               }}
             >
-              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-            </div>
-            {showProfile && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "60px",
-                  right: "0",
-                  backgroundColor: "white",
-                  padding: "20px",
-                  borderRadius: "15px",
-                  boxShadow: "0 10px 25px rgba(31, 17, 71, 0.12)",
-                  minWidth: "220px",
-                  textAlign: "center",
-                  zIndex: 1000,
-                  border: "1px solid #f3d4e7",
-                }}
-              >
-                <h3 style={{ margin: "0 0 5px", color: "#1f1147", fontSize: "16px" }}>{user?.name}</h3>
-                <p style={{ fontSize: "13px", color: "#666", margin: "0 0 15px" }}>{user?.email}</p>
-                <button
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    navigate("/login");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    border: "none",
-                    background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* INTRO CARD */}
-        <div
-          style={{
-            background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
-            color: "white",
-            padding: "30px 35px",
-            borderRadius: "20px",
-            marginBottom: "30px",
-            boxShadow: "0 8px 25px rgba(236,72,153,0.25)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "10px" }}>
-            <span style={{ fontSize: "32px" }}>🤖</span>
-            <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "700", color: "white" }}>
-              Your AI Safety Companion
-            </h2>
-          </div>
-          <p style={{ margin: 0, fontSize: "15px", opacity: 0.92, maxWidth: "600px", textAlign: "left" }}>
-            Get instant safety guidance, emergency advice, complaint letters, and campus support — available anytime you need help.
-          </p>
-        </div>
-
-        {/* SUGGESTED PROMPTS */}
-        <div style={{ marginBottom: "30px", textAlign: "left" }}>
-          <h3 style={{ margin: "0 0 15px", fontSize: "16px", fontWeight: "600", color: "#475569" }}>
-            Quick Prompts
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "14px",
-            }}
-          >
-            {SUGGESTED_PROMPTS.map((prompt) => (
-              <button
-                key={prompt.label}
-                onClick={() => setMessage(prompt.text)}
-                className="prompt-chip btn-interact"
-                style={{
-                  backgroundColor: "white",
-                  border: "1px solid #f3d4e7",
-                  borderRadius: "16px",
-                  padding: "18px 20px",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ fontSize: "24px" }}>{prompt.icon}</span>
-                <span style={{ fontWeight: "600", color: "#1f1147", fontSize: "14px" }}>
+                <span style={{ fontWeight: "700", color: "#1f1147", fontSize: "15px" }}>
                   {prompt.label}
                 </span>
-              </button>
-            ))}
-          </div>
+              </div>
+              <p style={{ margin: 0, fontSize: "13px", color: "#64748b", lineHeight: "1.5" }}>
+                {prompt.desc}
+              </p>
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* CHAT INPUT CARD */}
-        <div
+      {/* QUESTION INPUT CARD */}
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "24px",
+          padding: "30px",
+          boxShadow: "0 10px 30px rgba(31, 17, 71, 0.04)",
+          border: "1px solid #f3d4e7",
+          marginBottom: "28px",
+        }}
+      >
+        <label
           style={{
-            backgroundColor: "white",
-            borderRadius: "20px",
-            padding: "30px",
-            boxShadow: "0 4px 25px rgba(31, 17, 71, 0.02)",
-            border: "1px solid #f3d4e7",
-            marginBottom: "25px",
-            textAlign: "left",
+            display: "block",
+            marginBottom: "10px",
+            fontSize: "14px",
+            fontWeight: "700",
+            color: "#334155",
           }}
         >
-          <label style={{ fontSize: "14px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "12px" }}>
-            Ask a Question
-          </label>
-          <textarea
-            rows="5"
-            placeholder="Ask anything about campus safety, emergencies, hostel tips, or request a complaint letter..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="input-field"
-            style={{
-              width: "100%",
-              padding: "16px",
-              borderRadius: "12px",
-              border: "1px solid #cbd5e1",
-              resize: "none",
-              fontSize: "15px",
-              outline: "none",
-              fontFamily: "inherit",
-              boxSizing: "border-box",
-              lineHeight: "1.6",
-            }}
-          />
-          <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#94a3b8" }}>
-            Press Enter to send · Shift+Enter for new line
-          </p>
+          Type Your Safety Question or Request
+        </label>
 
-          <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <button
-              onClick={askAI}
-              disabled={loading}
-              className="btn-interact"
-              style={{
-                padding: "14px 28px",
-                borderRadius: "12px",
-                border: "none",
-                background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: "15px",
-                cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: "0 4px 15px rgba(236,72,153,0.25)",
-                opacity: loading ? 0.7 : 1,
-              }}
-            >
-              {loading ? "🤖 Thinking..." : "Ask AI ➜"}
-            </button>
+        <textarea
+          rows="4"
+          placeholder="Ask for guidance (e.g. 'How should I report an issue to campus security?', 'Write a complaint letter about poor hostel lighting', 'Tips for safe night travel')..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="modern-input"
+          style={{
+            resize: "vertical",
+            lineHeight: "1.6",
+            fontSize: "15px",
+            marginBottom: "8px",
+          }}
+        />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginTop: "12px" }}>
+          <span style={{ fontSize: "12.5px", color: "#94a3b8" }}>
+            Press <strong>Enter ↵</strong> to send · <strong>Shift+Enter</strong> for newline
+          </span>
+
+          <div style={{ display: "flex", gap: "10px" }}>
             <button
               onClick={clearChat}
-              className="btn-interact"
               style={{
-                padding: "14px 28px",
+                padding: "12px 20px",
                 borderRadius: "12px",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #cbd5e1",
                 backgroundColor: "white",
                 color: "#64748b",
                 fontWeight: "600",
-                fontSize: "15px",
+                fontSize: "14px",
                 cursor: "pointer",
               }}
             >
-              🗑 Clear
+              Clear
+            </button>
+
+            <button
+              onClick={() => askAI()}
+              disabled={loading}
+              className="btn-primary"
+              style={{
+                padding: "12px 28px",
+                borderRadius: "12px",
+                fontWeight: "700",
+                fontSize: "14.5px",
+                cursor: loading ? "wait" : "pointer",
+                opacity: loading ? 0.75 : 1,
+              }}
+            >
+              {loading ? "Thinking..." : "Ask AI ➜"}
             </button>
           </div>
         </div>
+      </div>
 
-        {/* AI RESPONSE */}
-        {reply && (
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "20px",
-              padding: "30px",
-              boxShadow: "0 4px 25px rgba(31, 17, 71, 0.02)",
-              border: "1px solid #f3d4e7",
-              textAlign: "left",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+      {/* AI RESPONSE CARD */}
+      {reply && (
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "24px",
+            padding: "32px",
+            boxShadow: "0 10px 30px rgba(31, 17, 71, 0.04)",
+            border: "1px solid #f3d4e7",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, #8b5cf6, #ec4899)",
+                  color: "white",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "18px",
+                  fontSize: "20px",
+                  boxShadow: "0 4px 12px rgba(236, 72, 153, 0.25)",
                 }}
               >
                 🤖
               </div>
-              <h3 style={{ margin: 0, color: "#1f1147", fontSize: "18px", fontWeight: "700" }}>
-                AI Response
-              </h3>
-            </div>
-
-            <div
-              style={{
-                whiteSpace: "pre-wrap",
-                lineHeight: "1.8",
-                color: "#334155",
-                fontSize: "15px",
-                backgroundColor: "#fdf2f8",
-                padding: "20px 24px",
-                borderRadius: "16px",
-                border: "1px solid #fce7f3",
-              }}
-            >
-              {reply}
+              <div>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "18px",
+                    fontWeight: "800",
+                    color: "#1f1147",
+                    fontFamily: "var(--font-display)",
+                  }}
+                >
+                  CampusSafeHer AI Guidance
+                </h3>
+                <span style={{ fontSize: "12px", color: "#64748b" }}>
+                  Generated advice & safety recommendations
+                </span>
+              </div>
             </div>
 
             <button
               onClick={copyResponse}
-              className="btn-interact"
               style={{
-                marginTop: "20px",
-                padding: "12px 24px",
-                borderRadius: "12px",
-                border: "none",
-                background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                color: "white",
-                fontWeight: "600",
-                fontSize: "14px",
+                padding: "8px 16px",
+                borderRadius: "10px",
+                border: "1px solid #ddd6fe",
+                backgroundColor: "#f5f3ff",
+                color: "#7c3aed",
+                fontWeight: "700",
+                fontSize: "13px",
                 cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(236,72,153,0.2)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
             >
-              📋 Copy Response
+              <span>📋</span>
+              <span>Copy Response</span>
             </button>
           </div>
-        )}
 
-        {!reply && !loading && (
           <div
             style={{
-              backgroundColor: "white",
-              borderRadius: "20px",
-              padding: "50px 40px",
-              textAlign: "center",
-              border: "1px solid #f3d4e7",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "12px",
+              backgroundColor: "#fdf4f9",
+              padding: "24px",
+              borderRadius: "18px",
+              border: "1px solid #fce7f3",
+              color: "#334155",
+              fontSize: "15px",
+              lineHeight: "1.8",
+              whiteSpace: "pre-wrap",
             }}
           >
-            <div style={{ fontSize: "48px" }}>💬</div>
-            <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600", color: "#1f1147" }}>
-              Start a conversation
-            </h3>
-            <p style={{ margin: 0, color: "#6b6375", maxWidth: "400px", fontSize: "14px" }}>
-              Pick a quick prompt above or type your own question to get personalized safety guidance.
-            </p>
+            {reply}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+
+      {/* EMPTY CONVERSATION PROMPT STATE */}
+      {!reply && !loading && (
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "24px",
+            padding: "50px 30px",
+            textAlign: "center",
+            border: "1px solid #f3d4e7",
+            boxShadow: "0 10px 30px rgba(31, 17, 71, 0.03)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "14px",
+          }}
+        >
+          <div style={{ fontSize: "40px" }}>💬</div>
+          <h3
+            style={{
+              fontFamily: "var(--font-display)",
+              margin: 0,
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#1f1147",
+            }}
+          >
+            How can the Safety AI support you?
+          </h3>
+          <p style={{ margin: 0, color: "#64748b", maxWidth: "420px", fontSize: "14px", lineHeight: "1.6" }}>
+            Click one of the suggested prompts above or type your own question to receive safety protocols, advice, and letter drafts.
+          </p>
+        </div>
+      )}
+    </DashboardLayout>
   );
 }
 

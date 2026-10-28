@@ -1,42 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import logo from "../assets/logo.webp";
-import dashboardBg from "../assets/dashboard-bg.png";
-
-const navLinkStyle = {
-  padding: "14px 16px",
-  borderRadius: "12px",
-  cursor: "pointer",
-  color: "#555",
-  fontWeight: "500",
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  transition: "all 0.2s ease",
-};
-
-const activeNavStyle = {
-  ...navLinkStyle,
-  color: "#ec4899",
-  fontWeight: "600",
-  backgroundColor: "#fdf2f8",
-};
+import DashboardLayout from "../components/DashboardLayout";
 
 function Alerts() {
-  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [checkInNotifications, setCheckInNotifications] = useState([]);
   const [user, setUser] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
   const [toast, setToast] = useState(null);
-
-  useEffect(() => {
-    fetchUser();
-    fetchNotifications();
-    fetchCheckInNotifications();
-  }, []);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const fetchUser = async () => {
     try {
@@ -48,11 +19,6 @@ function Alerts() {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 4000);
   };
 
   const fetchNotifications = async () => {
@@ -78,6 +44,12 @@ function Alerts() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+    fetchNotifications();
+    fetchCheckInNotifications();
+  }, []);
 
   const deleteAlert = async (id) => {
     try {
@@ -128,19 +100,20 @@ function Alerts() {
 
     const badgeBg = isEmergency ? "#fee2e2" : "#dcfce7";
     const badgeColor = isEmergency ? "#b91c1c" : "#15803d";
+    const badgeBorder = isEmergency ? "#fca5a5" : "#86efac";
     const badgeLabel = isEmergency
       ? type === "checkin"
-        ? "🟠 Check-In Alert"
-        : "🚨 Emergency SOS"
-      : "✅ Safety Confirmed";
+        ? "🟠 Check-In Overdue Alert"
+        : "🚨 Urgent SOS Emergency"
+      : "✅ Safe Arrival Confirmed";
 
     const message = isEmergency
       ? type === "checkin"
-        ? `${senderName} has not confirmed that she arrived at her expected destination. Please check on her and contact her if necessary.`
-        : `${senderName} is in an emergency. Please contact her immediately.`
+        ? `${senderName} has not confirmed that she arrived at her expected destination. Please check on her immediately.`
+        : `${senderName} has triggered an Emergency SOS alert! Please contact her immediately or notify campus responders.`
       : type === "checkin"
-        ? `${senderName} confirmed that she arrived safely at her destination. No further action is required.`
-        : `${senderName} has confirmed her safety. No further action is required.`;
+        ? `${senderName} has arrived safely at her destination. No further action is required.`
+        : `${senderName} has confirmed her safety. The emergency status has been resolved.`;
 
     const onDelete =
       type === "checkin"
@@ -150,115 +123,152 @@ function Alerts() {
     return (
       <div
         key={notification._id}
-        className="alert-grid-card"
+        className="alert-card-modern"
         style={{
           backgroundColor: "white",
-          borderRadius: "20px",
-          padding: "24px",
-          boxShadow: "0 4px 15px rgba(31, 17, 71, 0.01)",
-          border: isEmergency ? "1px solid #fecaca" : "1px solid #f3d4e7",
+          borderRadius: "22px",
+          padding: "26px",
+          boxShadow: "0 6px 20px rgba(31, 17, 71, 0.03)",
+          border: `1.5px solid ${isEmergency ? "#fecaca" : "#bbf7d0"}`,
+          display: "flex",
+          gap: "20px",
+          alignItems: "flex-start",
         }}
       >
-        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+        {/* AVATAR */}
+        <div
+          style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: isEmergency
+              ? "linear-gradient(135deg, #f472b6, #ef4444)"
+              : "linear-gradient(135deg, #34d399, #059669)",
+            color: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "22px",
+            fontWeight: "800",
+            flexShrink: 0,
+            boxShadow: isEmergency
+              ? "0 6px 18px rgba(239, 68, 68, 0.3)"
+              : "0 6px 18px rgba(16, 185, 129, 0.25)",
+          }}
+        >
+          {initial}
+        </div>
+
+        {/* DETAILS */}
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              width: "52px",
-              height: "52px",
-              borderRadius: "50%",
-              background: isEmergency
-                ? "linear-gradient(135deg, #f472b6, #ef4444)"
-                : "linear-gradient(135deg, #34d399, #6ee7b7)",
-              color: "white",
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "20px",
-              fontWeight: "bold",
-              flexShrink: 0,
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: "12px",
+              marginBottom: "8px",
+              flexWrap: "wrap",
             }}
           >
-            {initial}
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", marginBottom: "8px", flexWrap: "wrap" }}>
-              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#1f1147" }}>
+            <div>
+              <h3
+                style={{
+                  margin: "0 0 2px",
+                  fontSize: "18px",
+                  fontWeight: "800",
+                  color: "#1f1147",
+                  fontFamily: "var(--font-display)",
+                }}
+              >
                 {senderName}
               </h3>
-              <span
-                style={{
-                  backgroundColor: badgeBg,
-                  color: badgeColor,
-                  padding: "4px 12px",
-                  borderRadius: "20px",
-                  fontSize: "11px",
-                  fontWeight: "bold",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {badgeLabel}
-              </span>
+              <div style={{ fontSize: "13px", color: "#64748b" }}>
+                ✉️ {notification.sender?.email || "Email undisclosed"}
+              </div>
             </div>
 
-            <p style={{ margin: "0 0 4px", fontSize: "13px", color: "#64748b" }}>
-              ✉️ {notification.sender?.email}
-            </p>
-            <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#94a3b8" }}>
-              🕐 {new Date(notification.createdAt).toLocaleString()}
-            </p>
-
-            <p
+            <span
               style={{
-                margin: "0 0 16px",
-                fontSize: "14px",
-                color: isEmergency ? "#991b1b" : "#166534",
-                lineHeight: "1.5",
-                backgroundColor: isEmergency ? "#fef2f2" : "#f0fdf4",
-                padding: "12px 14px",
-                borderRadius: "12px",
+                backgroundColor: badgeBg,
+                color: badgeColor,
+                border: `1px solid ${badgeBorder}`,
+                padding: "4px 12px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: "700",
+                whiteSpace: "nowrap",
               }}
             >
-              {message}
-            </p>
+              {badgeLabel}
+            </span>
+          </div>
 
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {lat && lng && (
-                <button
-                  onClick={() =>
-                    window.open(`https://maps.google.com/?q=${lat},${lng}`, "_blank")
-                  }
-                  className="btn-interact"
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: "10px",
-                    border: "none",
-                    background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                    color: "white",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                  }}
-                >
-                  📍 Open Location
-                </button>
-              )}
+          <div style={{ fontSize: "12.5px", color: "#94a3b8", marginBottom: "14px" }}>
+            🕐 Received on {new Date(notification.createdAt).toLocaleString()}
+          </div>
+
+          {/* MESSAGE BOX */}
+          <div
+            style={{
+              marginBottom: "18px",
+              fontSize: "14.5px",
+              color: isEmergency ? "#991b1b" : "#166534",
+              lineHeight: "1.6",
+              backgroundColor: isEmergency ? "#fff1f2" : "#f0fdf4",
+              border: `1px solid ${isEmergency ? "#fecdd3" : "#bbf7d0"}`,
+              padding: "14px 18px",
+              borderRadius: "14px",
+              fontWeight: isEmergency ? "600" : "500",
+            }}
+          >
+            {message}
+          </div>
+
+          {/* ACTIONS */}
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            {lat && lng && (
               <button
-                onClick={onDelete}
-                className="btn-interact"
+                onClick={() =>
+                  window.open(`https://maps.google.com/?q=${lat},${lng}`, "_blank")
+                }
                 style={{
-                  padding: "10px 18px",
-                  borderRadius: "10px",
-                  border: "1px solid #fecaca",
-                  backgroundColor: "#fef2f2",
-                  color: "#ef4444",
-                  fontWeight: "600",
-                  fontSize: "14px",
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: "linear-gradient(90deg, #8b5cf6, #ec4899)",
+                  color: "white",
+                  fontWeight: "700",
+                  fontSize: "13.5px",
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  boxShadow: "0 4px 14px rgba(236, 72, 153, 0.25)",
                 }}
               >
-                🗑 Delete Alert
+                <span>📍 View Live Location (Maps)</span>
               </button>
-            </div>
+            )}
+
+            <button
+              onClick={onDelete}
+              style={{
+                padding: "10px 18px",
+                borderRadius: "12px",
+                border: "1px solid #fecaca",
+                backgroundColor: "#fef2f2",
+                color: "#dc2626",
+                fontWeight: "600",
+                fontSize: "13.5px",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span>🗑 Dismiss Alert</span>
+            </button>
           </div>
         </div>
       </div>
@@ -266,314 +276,190 @@ function Alerts() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg,#fff1f8,#fff7fd)",
-        fontFamily: "var(--sans)",
-        color: "#1f1147",
-        position: "relative",
-      }}
+    <DashboardLayout
+      activeKey="alerts"
+      pageTitle="Safety Alerts"
+      pageSubtitle="Incoming peer & circle notifications"
+      user={user}
+      toast={toast}
+      onDismissToast={() => setToast(null)}
     >
       <style>{`
-        .alert-grid-card {
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        .alert-card-modern {
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .alert-grid-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(31, 17, 71, 0.08) !important;
-        }
-        .btn-interact {
-          transition: all 0.2s ease;
-        }
-        .btn-interact:hover {
-          filter: brightness(1.05);
-          transform: translateY(-1px);
-        }
-        .btn-interact:active {
-          transform: translateY(0);
+        .alert-card-modern:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 14px 30px rgba(31, 17, 71, 0.08) !important;
         }
       `}</style>
 
-      {toast && (
-        <div
+      {/* HEADER HERO */}
+      <div style={{ marginBottom: "28px" }}>
+        <h1
           style={{
-            position: "fixed",
-            bottom: "30px",
-            right: "30px",
-            backgroundColor: toast.type === "success" ? "#10b981" : "#ef4444",
-            color: "white",
-            padding: "16px 24px",
-            borderRadius: "12px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            fontWeight: "bold",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(1.8rem, 3.2vw, 2.3rem)",
+            color: "#1f1147",
+            fontWeight: "800",
+            margin: "0 0 6px",
           }}
         >
-          <span>{toast.type === "success" ? "✅" : "⚠️"}</span>
-          <span>{toast.message}</span>
-        </div>
-      )}
-
-      {/* SIDEBAR */}
-      <div
-        style={{
-          width: showSidebar ? "260px" : "0",
-          backgroundColor: "white",
-          borderRight: showSidebar ? "1px solid #f3d4e7" : "none",
-          padding: showSidebar ? "25px" : "0",
-          overflow: "hidden",
-          transition: "width 0.3s ease, padding 0.3s ease",
-          boxShadow: showSidebar ? "4px 0 20px rgba(31, 17, 71, 0.04)" : "none",
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
-            cursor: "pointer",
-            paddingBottom: "15px",
-            borderBottom: "1px solid #fdf2f8",
-          }}
-          onClick={() => navigate("/dashboard")}
-        >
-          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
-          <h3 style={{ color: "#1f1147", margin: 0, fontWeight: "700", letterSpacing: "-0.5px" }}>
-            CampusSafe<span style={{ color: "#ec4899" }}>Her</span>
-          </h3>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
-          {[
-            { path: "/dashboard", icon: "🏠", label: "Dashboard" },
-            { path: "/contacts", icon: "👥", label: "Trusted Contacts" },
-            { path: "/incidents", icon: "📝", label: "Report Incident" },
-            { path: "/checkins", icon: "📍", label: "Check-Ins" },
-            { path: "/alerts", icon: "🔔", label: "Safety Alerts", active: true },
-            { path: "/ai", icon: "🤖", label: "AI Safety Chat" },
-          ].map((item) => (
-            <span
-              key={item.path}
-              onClick={() => !item.active && navigate(item.path)}
-              style={item.active ? activeNavStyle : navLinkStyle}
-              onMouseEnter={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "#fdf2f8";
-                  e.currentTarget.style.color = "#ec4899";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!item.active) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#555";
-                }
-              }}
-            >
-              {item.icon} {item.label}
-            </span>
-          ))}
-        </div>
-
-        <div style={{ paddingTop: "20px", borderTop: "1px solid #f3d4e7" }}>
-          <span
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/login");
-            }}
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#ef4444",
-              fontWeight: "500",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fef2f2")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-          >
-            🚪 Logout
-          </span>
-        </div>
+          Safety Alerts Inbox
+        </h1>
+        <p style={{ color: "#64748b", fontSize: "15px", margin: 0 }}>
+          Notifications from friends, roommates, and trusted contacts who have requested help or triggered overdue check-in timers.
+        </p>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* FILTER TABS */}
       <div
         style={{
-          flex: 1,
-          padding: "30px",
           display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          backgroundImage: `url(${dashboardBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center right",
-          backgroundRepeat: "no-repeat",
+          gap: "10px",
+          marginBottom: "26px",
+          flexWrap: "wrap",
         }}
       >
-        {/* TOP BAR */}
+        <button
+          onClick={() => setActiveFilter("all")}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "12px",
+            border: activeFilter === "all" ? "2px solid #8b5cf6" : "1px solid #cbd5e1",
+            backgroundColor: activeFilter === "all" ? "#f5f3ff" : "white",
+            color: activeFilter === "all" ? "#7c3aed" : "#475569",
+            fontWeight: "700",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
+        >
+          All Alerts ({totalAlerts})
+        </button>
+
+        <button
+          onClick={() => setActiveFilter("sos")}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "12px",
+            border: activeFilter === "sos" ? "2px solid #ec4899" : "1px solid #cbd5e1",
+            backgroundColor: activeFilter === "sos" ? "#fdf2f8" : "white",
+            color: activeFilter === "sos" ? "#be185d" : "#475569",
+            fontWeight: "700",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
+        >
+          🚨 SOS Alerts ({notifications.length})
+        </button>
+
+        <button
+          onClick={() => setActiveFilter("checkin")}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "12px",
+            border: activeFilter === "checkin" ? "2px solid #0ea5e9" : "1px solid #cbd5e1",
+            backgroundColor: activeFilter === "checkin" ? "#f0f9ff" : "white",
+            color: activeFilter === "checkin" ? "#0369a1" : "#475569",
+            fontWeight: "700",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
+        >
+          📍 Check-In Alerts ({checkInNotifications.length})
+        </button>
+      </div>
+
+      {/* CONTENT FEED */}
+      {totalAlerts === 0 ? (
+        /* ALL CLEAR EMPTY STATE */
         <div
           style={{
             backgroundColor: "white",
-            borderRadius: "20px",
-            padding: "15px 30px",
+            borderRadius: "24px",
+            padding: "70px 30px",
+            textAlign: "center",
+            border: "1px solid #f3d4e7",
+            boxShadow: "0 10px 30px rgba(31, 17, 71, 0.03)",
             display: "flex",
-            justifyContent: "space-between",
+            flexDirection: "column",
             alignItems: "center",
-            boxShadow: "0 4px 15px rgba(31, 17, 71, 0.03)",
-            marginBottom: "35px",
+            gap: "16px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span
-              onClick={() => setShowSidebar(!showSidebar)}
-              style={{ fontSize: "24px", cursor: "pointer", color: "#1f1147", padding: "5px" }}
-            >
-              ☰
-            </span>
-            <h4 style={{ margin: 0, color: "#6b6375", fontWeight: "500" }}>
-              Incoming Safety Alerts
-            </h4>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "15px", position: "relative" }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontWeight: "600", color: "#1f1147", fontSize: "15px" }}>
-                {user?.name || "Student User"}
-              </div>
-              <div style={{ fontSize: "12px", color: "#ec4899", fontWeight: "600" }}>
-                Active Profile
-              </div>
-            </div>
-            <div
-              onClick={() => setShowProfile(!showProfile)}
-              style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
-                color: "white",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                fontWeight: "bold",
-                cursor: "pointer",
-                boxShadow: "0 3px 10px rgba(236,72,153,0.2)",
-              }}
-            >
-              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-            </div>
-            {showProfile && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "60px",
-                  right: "0",
-                  backgroundColor: "white",
-                  padding: "20px",
-                  borderRadius: "15px",
-                  boxShadow: "0 10px 25px rgba(31, 17, 71, 0.12)",
-                  minWidth: "220px",
-                  textAlign: "center",
-                  zIndex: 1000,
-                  border: "1px solid #f3d4e7",
-                }}
-              >
-                <h3 style={{ margin: "0 0 5px", color: "#1f1147", fontSize: "16px" }}>{user?.name}</h3>
-                <p style={{ fontSize: "13px", color: "#666", margin: "0 0 15px" }}>{user?.email}</p>
-                <button
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    navigate("/login");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    border: "none",
-                    background: "linear-gradient(90deg,#8b5cf6,#ec4899)",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {totalAlerts === 0 ? (
           <div
             style={{
-              backgroundColor: "white",
-              borderRadius: "20px",
-              padding: "80px 40px",
-              textAlign: "center",
-              border: "1px solid #f3d4e7",
+              width: "76px",
+              height: "76px",
+              borderRadius: "24px",
+              backgroundColor: "#fdf2f8",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
-              gap: "15px",
+              justifyContent: "center",
+              fontSize: "38px",
             }}
           >
-            <div style={{ fontSize: "60px" }}>🔔</div>
-            <h3 style={{ margin: 0, fontSize: "20px", fontWeight: "600", color: "#1f1147" }}>
-              No alerts received
-            </h3>
-            <p style={{ margin: 0, color: "#6b6375", maxWidth: "400px", fontSize: "14px" }}>
-              When someone in your trusted circle sends an SOS or misses a check-in, their alerts will appear here.
-            </p>
+            🔔
           </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "35px" }}>
-            {checkInNotifications.length > 0 && (
-              <section>
-                <div style={{ marginBottom: "20px" }}>
-                  <h2 style={{ margin: "0 0 5px", fontSize: "22px", fontWeight: "700", color: "#1f1147" }}>
-                    Check-In Alerts ({checkInNotifications.length})
-                  </h2>
-                  <p style={{ margin: 0, color: "#6b6375", fontSize: "14px" }}>
-                    Notifications from missed or completed safety check-ins.
-                  </p>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  {checkInNotifications.map((n) => renderAlertCard(n, "checkin"))}
-                </div>
-              </section>
-            )}
+          <h3
+            style={{
+              fontFamily: "var(--font-display)",
+              margin: 0,
+              fontSize: "20px",
+              fontWeight: "700",
+              color: "#1f1147",
+            }}
+          >
+            No active safety alerts
+          </h3>
+          <p style={{ margin: 0, color: "#64748b", maxWidth: "380px", fontSize: "15px", lineHeight: "1.6" }}>
+            All clear! When a member of your trusted circle triggers an emergency or is overdue, their real-time alert will appear here.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+          {/* SOS NOTIFICATIONS */}
+          {(activeFilter === "all" || activeFilter === "sos") && notifications.length > 0 && (
+            <div>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  margin: "0 0 14px",
+                  fontSize: "19px",
+                  fontWeight: "700",
+                  color: "#1f1147",
+                }}
+              >
+                Emergency SOS Broadcasts ({notifications.length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {notifications.map((n) => renderAlertCard(n, "sos"))}
+              </div>
+            </div>
+          )}
 
-            {notifications.length > 0 && (
-              <section>
-                <div style={{ marginBottom: "20px" }}>
-                  <h2 style={{ margin: "0 0 5px", fontSize: "22px", fontWeight: "700", color: "#1f1147" }}>
-                    SOS Alerts ({notifications.length})
-                  </h2>
-                  <p style={{ margin: 0, color: "#6b6375", fontSize: "14px" }}>
-                    Emergency SOS notifications from your trusted contacts.
-                  </p>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  {notifications.map((n) => renderAlertCard(n, "sos"))}
-                </div>
-              </section>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+          {/* CHECK-IN NOTIFICATIONS */}
+          {(activeFilter === "all" || activeFilter === "checkin") && checkInNotifications.length > 0 && (
+            <div>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  margin: "0 0 14px",
+                  fontSize: "19px",
+                  fontWeight: "700",
+                  color: "#1f1147",
+                }}
+              >
+                Journey Check-In Notifications ({checkInNotifications.length})
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {checkInNotifications.map((n) => renderAlertCard(n, "checkin"))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </DashboardLayout>
   );
 }
 
