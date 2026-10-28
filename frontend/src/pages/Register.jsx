@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 import registerImage from "../assets/register.png";
 import logo from "../assets/logo.webp";
@@ -60,17 +60,21 @@ function Register() {
       }}
     >
       {/* LOGO */}
-      <div
+      <Link
+        to="/"
         style={{
           display: "flex",
           alignItems: "center",
           gap: "12px",
           marginBottom: "40px",
+          textDecoration: "none",
+          cursor: "pointer",
+          width: "fit-content",
         }}
       >
         <img
           src={logo}
-          alt="Logo"
+          alt="CampusSafeHer Logo"
           style={{
             width: "40px",
             height: "40px",
@@ -85,15 +89,11 @@ function Register() {
           }}
         >
           CampusSafe
-          <span
-            style={{
-              color: "#ec4899",
-            }}
-          >
+          <span style={{ color: "#ec4899" }}>
             Her
           </span>
         </h2>
-      </div>
+      </Link>
 
       <h1
         style={{

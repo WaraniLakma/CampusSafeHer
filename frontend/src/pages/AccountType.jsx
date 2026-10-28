@@ -1,11 +1,19 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 function AccountType() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the intended action from the homepage.
+  const action = location.state?.action || "login";
 
   const handleSelection = (role) => {
     if (role === "student") {
-      navigate("/student-access");
+      if (action === "register") {
+        navigate("/register");
+      } else {
+        navigate("/login");
+      }
     } else {
       navigate("/admin-login");
     }

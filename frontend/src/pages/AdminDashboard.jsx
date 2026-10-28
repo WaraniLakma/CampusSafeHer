@@ -8,7 +8,6 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const [incidents, setIncidents] = useState([]);
   const [user, setUser] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -184,109 +183,6 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* SIDEBAR */}
-      <div
-        style={{
-          width: showSidebar ? "260px" : "0",
-          backgroundColor: "white",
-          borderRight: showSidebar ? "1px solid #f3d4e7" : "none",
-          padding: showSidebar ? "25px" : "0",
-          overflow: "hidden",
-          transition: "width 0.3s ease, padding 0.3s ease",
-          boxShadow: showSidebar ? "4px 0 20px rgba(31, 17, 71, 0.04)" : "none",
-          display: "flex",
-          flexDirection: "column",
-          zIndex: 100,
-        }}
-      >
-        {/* LOGO */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "45px",
-            cursor: "pointer",
-            paddingBottom: "15px",
-            borderBottom: "1px solid #fdf2f8",
-          }}
-          onClick={() => navigate("/")}
-        >
-          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
-          <h3 style={{ color: "#1f1147", margin: 0, fontWeight: "700", letterSpacing: "-0.5px" }}>
-            CampusSafe<span style={{ color: "#ec4899" }}>Her</span>
-          </h3>
-        </div>
-
-        {/* NAVIGATION LINKS */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", flexGrow: 1 }}>
-          <span
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#ec4899",
-              fontWeight: "600",
-              backgroundColor: "#fdf2f8",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
-            🛡️ Admin Control
-          </span>
-
-          <span
-            onClick={() => navigate("/dashboard")}
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#555",
-              fontWeight: "500",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#fdf2f8";
-              e.currentTarget.style.color = "#ec4899";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "#555";
-            }}
-          >
-            👤 User Dashboard
-          </span>
-        </div>
-
-        {/* SIDEBAR LOGOUT */}
-        <div style={{ paddingTop: "20px", borderTop: "1px solid #f3d4e7" }}>
-          <span
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/login");
-            }}
-            style={{
-              padding: "14px 16px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              color: "#ef4444",
-              fontWeight: "500",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#fef2f2")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-          >
-            🚪 Sign Out
-          </span>
-        </div>
-      </div>
 
       {/* MAIN CONTENT AREA */}
       <div
@@ -315,24 +211,45 @@ function AdminDashboard() {
             marginBottom: "35px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-            <span
-              onClick={() => setShowSidebar(!showSidebar)}
+          {/* CAMPUSSAFEHER LOGO */}
+          <div
+            onClick={() => navigate("/")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigate("/");
+              }
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={logo}
+              alt="CampusSafeHer logo"
               style={{
-                fontSize: "24px",
-                cursor: "pointer",
+                width: "45px",
+                height: "45px",
+                objectFit: "contain",
+              }}
+            />
+
+            <h3
+              style={{
                 color: "#1f1147",
-                padding: "5px",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
+                margin: 0,
+                fontWeight: "700",
+                letterSpacing: "-0.5px",
+                fontSize: "22px",
               }}
             >
-              ☰
-            </span>
-            <h4 style={{ margin: 0, color: "#6b6375", fontWeight: "500" }}>
-              Admin Portal / Dashboard
-            </h4>
+              CampusSafe<span style={{ color: "#ec4899" }}>Her</span>
+            </h3>
           </div>
 
           {/* ADMIN PROFILE */}
@@ -407,7 +324,8 @@ function AdminDashboard() {
                 <button
                   onClick={() => {
                     localStorage.removeItem("token");
-                    navigate("/login");
+                    setShowProfile(false);
+                    navigate("/admin-login", { replace: true });
                   }}
                   style={{
                     width: "100%",
