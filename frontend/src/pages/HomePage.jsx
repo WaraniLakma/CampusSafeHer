@@ -1021,10 +1021,10 @@ function HomePage() {
               ✉️ support@campussafeher.com
             </p>
             <p style={{ color: "#94a3b8", fontSize: "14px", margin: "0 0 8px" }}>
-              🏫 University of Ruhuna
+              Faculty of Engineering,
             </p>
             <p style={{ color: "#94a3b8", fontSize: "14px", margin: 0 }}>
-              🏆 DesignHer 2.0 Innovation Project
+              University of Ruhuna
             </p>
           </div>
         </div>
@@ -1037,20 +1037,16 @@ function HomePage() {
             paddingTop: "24px",
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
-            flexWrap: "wrap",
-            gap: "12px",
             color: "#64748b",
             fontSize: "13px",
+            textAlign: "center",
+            width: "100%",
           }}
         >
           <div>© 2026 CampusSafeHer. All Rights Reserved.</div>
-          <div style={{ display: "flex", gap: "20px" }}>
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
-            <span>Security Guarantee</span>
-          </div>
+          
         </div>
       </footer>
     </div>
