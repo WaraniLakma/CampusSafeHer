@@ -21,10 +21,23 @@ const app = express();
 connectDB();
 startCheckInMonitor();
 
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://campus-safe-her.vercel.app",
+];
+
 app.use(cors({
-origin: "https://campus-safe-her.vercel.app",
-credentials: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 }));
+
 app.use(express.json());
 
 app.use("/api/health", healthRoutes);

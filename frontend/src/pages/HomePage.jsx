@@ -117,7 +117,7 @@ function HomePage() {
           <a href="#features" className="nav-link">Features</a>
           <a href="#about" className="nav-link">About</a>
           <div style={{ display: "flex", gap: "12px" }}>
-            <Link to="/login">
+            <Link to="/account-type">
               <button
                 className="home-btn"
                 style={{
@@ -133,7 +133,7 @@ function HomePage() {
                 Log In
               </button>
             </Link>
-            <Link to="/register">
+            <Link to="/account-type">
               <button
                 className="home-btn"
                 style={{
@@ -210,7 +210,7 @@ function HomePage() {
           </p>
 
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-            <Link to="/register">
+            <Link to="/account-type">
               <button
                 className="home-btn"
                 style={{
@@ -462,7 +462,7 @@ function HomePage() {
               </div>
             </div>
 
-            <Link to="/register">
+            <Link to="/account-type">
               <button
                 className="home-btn"
                 style={{
@@ -525,8 +525,8 @@ function HomePage() {
             <h3 style={{ marginBottom: "16px", fontSize: "16px" }}>Quick Links</h3>
             {[
               { to: "/", label: "Home" },
-              { to: "/login", label: "Login" },
-              { to: "/register", label: "Register" },
+              { to: "/account-type", label: "Login" },
+              { to: "/account-type", label: "Register" },
             ].map((link) => (
               <p key={link.label} style={{ margin: "8px 0" }}>
                 <Link

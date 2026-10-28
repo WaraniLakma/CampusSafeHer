@@ -10,6 +10,9 @@ import AIChat from "./pages/AIChat";
 import AdminDashboard from "./pages/AdminDashboard";
 import Alerts from "./pages/Alerts";
 import HomePage from "./pages/HomePage";
+import AccountType from "./pages/AccountType";
+import AdminLogin from "./pages/AdminLogin";
+
 
 function App() {
   return (
@@ -26,6 +29,8 @@ function App() {
         <Route path="/ai" element={<AIChat />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/account-type" element={<AccountType />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
       </Routes>
     </BrowserRouter>
   );
