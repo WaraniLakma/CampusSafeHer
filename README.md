@@ -1,442 +1,375 @@
-# CampusSafeHer 🌸
+<div align="center">
+
+# CampusSafeHer
 ### A Smart Campus Safety Platform for Female University Students
 
-CampusSafeHer is a full-stack web application designed to improve the safety of female university students through emergency assistance, trusted contact management, incident reporting, safety check-ins, and AI-powered safety support.
+**Emergency assistance · Trusted circles · Journey check-ins · Incident reporting · AI safety guidance**
 
-🌐 **Live Application:** https://campus-safe-her.vercel.app
+[![React](https://img.shields.io/badge/Frontend-React-149eca?logo=react&logoColor=white)](https://react.dev/) [![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/) [![MongoDB](https://img.shields.io/badge/Database-MongoDB_Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas) [![License](https://img.shields.io/badge/License-Not_specified-lightgrey)](#)
 
-🎥 **Project Demonstration:** [Watch the Demo Video](YOUR_GOOGLE_DRIVE_DEMO_LINK)
+**[ Live Application](https://campus-safe-her.vercel.app)** · **[Source Code](https://github.com/WaraniLakma/CampusSafeHer)**
+
+</div>
 
 ---
 
-## 📌 Table of Contents
+## 📖 Table of Contents
 
-- [Problem Statement](#-problem-statement)
-- [Solution Overview](#-solution-overview)
-- [Key Features](#-key-features)
-- [Technologies Used](#-technologies-used)
+- [Overview](#-overview)
+- [Features](#-features)
+- [CRUD Implementation](#-crud-implementation)
+- [Technology Stack](#-technology-stack)
+- [University Demo Accounts](#-university-demo-accounts)
 - [System Architecture](#-system-architecture)
-- [Database Design](#-database-design)
-- [User Interface Screenshots](#-user-interface-screenshots)
-- [Installation and Setup](#-installation-and-setup)
-- [Environment Variables](#-environment-variables)
-- [Running the Application](#-running-the-application)
+- [Database Design and ERD](#-database-design-and-erd)
+- [Installation and Local Setup](#-installation-and-local-setup)
 - [Deployment](#-deployment)
-- [Competition](#-competition)
+- [Application Screenshots](#-application-screenshots)
 
----
+## Overview
 
-## 🚨 Problem Statement
+**CampusSafeHer** is a full-stack MERN web application developed to support the personal safety of female university students. It combines emergency SOS alerts, registered trusted contacts, journey safety timers, incident reporting, and AI-powered guidance in one student-friendly platform. A separate administrator portal helps campus staff review and manage reported incidents.
 
-Female university students may face safety concerns when travelling alone, returning to hostels late, or requiring immediate assistance during emergencies.
+The system uses **MongoDB Atlas** for persistent storage and **Mongoose** to define application data models and references.
 
-Traditional communication methods may not always provide an organized and timely way to request help, notify trusted contacts, or report safety-related incidents.
 
-CampusSafeHer aims to address these challenges through a centralized digital platform that supports emergency assistance, personal safety monitoring, and incident reporting.
+## Features
 
-## 💡 Solution Overview
+| Module | Student / Administrator functionality |
+|---|---|
+| Authentication | Student registration and login; separate administrator access; JWT-based sessions and password hashing |
+| Emergency SOS | Create an SOS alert containing GPS coordinates; notify registered trusted contacts |
+| Trusted Circle | Add registered users as trusted contacts, view the circle, and remove contacts |
+| Journey Check-Ins | Set a destination, expected arrival time, and reminder interval; confirm safe arrival; trigger overdue alerts |
+| Incident Reporting | Submit categorized incidents with locations and descriptions; optional anonymity and supporting evidence; view and remove reports |
+| Safety Alerts | View incoming SOS and check-in notifications, including location actions and dismiss controls |
+| AI Safety Assistant | Ask campus-safety questions and request guidance or complaint-letter drafts using Google Gemini |
+| Admin Console | Review submitted incidents, filter/search reports, and update incident resolution status |
 
-CampusSafeHer provides an accessible web-based platform where students can manage trusted contacts, send SOS alerts, create safety check-ins, report incidents, and receive AI-powered safety assistance.
 
-The platform also provides administrative functionality to support incident management and safety monitoring.
+### Feature and component breakdown
 
-The application is designed with a responsive user interface to improve accessibility across different devices.
+| Interface / Component | Responsibility | Related database collection |
+|---|---|---|
+| **Student Registration & Login** | Create student accounts, authenticate existing users, and start authorized sessions | `users` |
+| **Role Selection & Admin Login** | Direct students and administrators to their respective authentication workflows | `users` |
+| **Student Dashboard** | Display SOS action, check-in count, incident count, alert count, and trusted-circle summary | `sos`, `checkins`, `incidents`, notification collections, `trustedcontacts` |
+| **Trusted Circle Management** | Add registered contacts by email, list contacts, and remove saved relationships | `trustedcontacts`, `users` |
+| **Incident Reporting Center** | Submit incident details and evidence, view filed reports, and remove reports | `incidents` |
+| **Incident Command Center** | Search/filter reported incidents and change review/resolution status | `incidents` |
+| **Journey Safety Check-Ins** | Create a journey timer, display existing journeys, confirm arrival, and delete a check-in | `checkins` |
+| **Safety Alerts Inbox** | Show incoming SOS and check-in notifications with location links and dismiss controls | `sosnotifications`, `checkinnotifications` |
+| **AI Safety Assistant** | Request safety advice, emergency guidance, and complaint-letter drafts | Google Gemini API (not represented as a persistent collection in the ERD) |
 
----
+**Student workflow:** Register / Sign in → Manage trusted contacts → Activate SOS or check-in → Receive and review safety alerts → Submit and track incidents.
 
-## ✨ Key Features
+**Administrator workflow:** Sign in → View incident queue → Filter/search cases → Update incident status.
 
-### 1. User Authentication
-- Student registration and login.
-- Secure password hashing using bcrypt.
-- JWT-based authentication.
-- Role-based access for students and administrators.
 
-### 2. Emergency SOS Alerts
-- Send emergency SOS alerts.
-- Include geographical coordinates with an SOS alert.
-- Store SOS alert information for tracking and management.
-- Notify relevant users through the notification system.
+## CRUD Implementation
 
-### 3. Trusted Contact Management
-- Manage trusted contacts.
-- Associate trusted contacts with user accounts.
-- Support communication with trusted users during safety-related situations.
+**CRUD** stands for **Create, Read, Update, and Delete**. CampusSafeHer implements these operations across its MongoDB collections through RESTful APIs developed using Node.js and Express.js.
 
-### 4. Safety Check-Ins
-- Create safety check-ins with a destination and expected arrival time.
-- Track check-in status.
-- Manage reminders and overdue check-ins.
-- Generate notifications for safety alerts and safe confirmations.
+| CRUD Operation | What is Assessed? | Implementation in CampusSafeHer |
+|---|---|---|
+| **1. Create** | Adding new records through forms and API requests. | Student registration (`POST /api/auth/register`), adding trusted contacts (`POST /api/contacts`), submitting incident reports (`POST /api/incidents`), creating safety check-ins (`POST /api/checkins`), and triggering emergency SOS alerts (`POST /api/sos`). |
+| **2. Read** | Retrieving, listing, and displaying stored records. | Viewing user profiles, trusted contacts, incident reports, safety check-ins, and safety notifications through `GET` endpoints. Administrators can retrieve all incident reports using `GET /api/admin/incidents`. |
+| **3. Update** | Modifying existing records and updating their status. | Administrators update incident statuses (`PATCH /api/admin/incidents/:id`). Students complete check-ins (`PATCH /api/checkins/:id`), update GPS locations (`PUT /api/checkins/:id/location`), and resolve SOS alerts (`PATCH /api/sos/:id/resolve`). |
+| **4. Delete** | Removing existing records through authorized API requests. | Deleting trusted contacts (`DELETE /api/contacts/:id`), incident reports (`DELETE /api/incidents/:id`), safety check-ins (`DELETE /api/checkins/:id`), and SOS/check-in notifications through their respective `DELETE` endpoints. |
 
-### 5. Incident Reporting
-- Submit safety-related incident reports.
-- Record incident categories, descriptions, and locations.
-- Support anonymous incident reporting.
-- Attach supporting files where supported.
-- Track incident status.
+> **Note:** CRUD operations are implemented according to each feature's requirements. Not every MongoDB collection exposes all four operations.
 
-### 6. AI-Powered Safety Assistant
-- Provide AI-powered safety assistance using the Google Gemini API.
-- Support users with safety-related guidance.
-- Generate complaint letters where the relevant feature is available.
 
-### 7. Administrative Dashboard
-- Provide administrative access.
-- Support incident management.
-- Present safety-related information for administrative monitoring.
+###  RESTful API endpoint specification
 
-### 8. Responsive User Interface
-- Provide a user-friendly interface.
-- Support navigation across the main application pages.
-- Improve usability on different screen sizes.
 
----
+| Route file | Method | Full API path | Operation | Purpose | Access |
+|---|---|---|---|---|---|
+| `authRoutes.js` | `POST` | `/api/auth/register` | Create | Register account | Public |
+| `authRoutes.js` | `POST` | `/api/auth/login` | Auth | Login and receive authentication response | Public |
+| `authRoutes.js` | `GET` | `/api/auth/profile` | Read | Retrieve current user profile | Protected |
+| `contactRoutes.js` | `POST` | `/api/contacts` | Create | Add trusted contact | Protected |
+| `contactRoutes.js` | `GET` | `/api/contacts` | Read | List trusted contacts | Protected |
+| `contactRoutes.js` | `DELETE` | `/api/contacts/:id` | Delete | Remove trusted contact | Protected |
+| `incidentRoutes.js` | `POST` | `/api/incidents` | Create | Submit incident | Protected |
+| `incidentRoutes.js` | `GET` | `/api/incidents` | Read | List own incidents | Protected |
+| `incidentRoutes.js` | `DELETE` | `/api/incidents/:id` | Delete | Remove incident | Protected |
+| `adminRoutes.js` | `GET` | `/api/admin/incidents` | Read | List all incidents | Admin |
+| `adminRoutes.js` | `PATCH` | `/api/admin/incidents/:id` | Update | Update incident status | Admin |
+| `checkInRoutes.js` | `POST` | `/api/checkins` | Create | Create journey check-in | Protected |
+| `checkInRoutes.js` | `GET` | `/api/checkins` | Read | List own check-ins | Protected |
+| `checkInRoutes.js` | `PATCH` | `/api/checkins/:id` | Update | Complete check-in | Protected |
+| `checkInRoutes.js` | `PUT` | `/api/checkins/:id/location` | Update | Update check-in location | Protected |
+| `checkInRoutes.js` | `DELETE` | `/api/checkins/:id` | Delete | Remove check-in | Protected |
+| `checkInRoutes.js` | `GET` | `/api/checkins/notifications` | Read | Get check-in notifications | Protected |
+| `checkInRoutes.js` | `DELETE` | `/api/checkins/notifications/:id` | Delete | Dismiss/delete check-in notification | Protected |
+| `sosRoutes.js` | `POST` | `/api/sos` | Create | Trigger SOS | Protected |
+| `sosRoutes.js` | `PATCH` | `/api/sos/:id/resolve` | Update | Resolve SOS | Protected |
+| `sosRoutes.js` | `GET` | `/api/sos/notifications` | Read | Get SOS notifications | Protected |
+| `sosRoutes.js` | `DELETE` | `/api/sos/notifications/:id` | Delete | Dismiss/delete SOS notification | Protected |
+| `aiRoutes.js` | `POST` | `/api/ai/chat` | AI action | Submit AI chat request | Protected |
+| `healthRoutes.js` | `GET` | `/api/health` | Health check | Check API availability | Public |
 
-## 🛠 Technologies Used
+**Note:** `Protected` indicates `protect` middleware, and `Admin` indicates both `protect` and `adminOnly`. Request body fields and response formats should be confirmed from the controllers.### 📊 CRUD operations by feature
 
-| Component | Technologies |
+| CRUD operation | CampusSafeHer implementation | User-facing evidence | Main collections |
+|---|---|---|---|
+| **Create** | Registration, adding trusted contacts, filing incidents, starting check-ins, triggering SOS | Registration form, Add to Trusted Circle, Submit Incident Report, Activate Check-In, SEND SOS | `users`, `trustedcontacts`, `incidents`, `checkins`, `sos` |
+| **Read** | Display trusted circle, check-in history, incident lists, administrator queue, and incoming alerts | Dashboard, Trusted Contacts, Incident Reporting, Incident Command Center, Safety Alerts | All seven main collections, as applicable |
+| **Update** | Change incident investigation status; confirm safe arrival and update check-in state | Admin status buttons; I've Arrived Safely | `incidents`, `checkins` |
+| **Delete** | Remove trusted contacts, submitted incidents, and check-ins | Trash/remove controls on the corresponding screens | `trustedcontacts`, `incidents`, `checkins` |
+
+*This table describes the demonstrated workflows, not full CRUD support for every collection.*
+
+### CRUD workflows
+
+**1. Trusted contact management**
+
+1. **Create:** A student enters the registered email of another user and selects a relationship.
+2. **Read:** The trusted circle displays saved contacts.
+3. **Delete:** The student removes a contact from the circle.
+4. **Data relationship:** `trustedcontacts.user` and `trustedcontacts.trustedUser` refer to `users` documents.
+
+**2. Incident management**
+
+1. **Create:** A student submits a category, description, location, and optionally an attachment or anonymous flag.
+2. **Read:** The student sees submitted reports; administrators see the incident queue.
+3. **Update:** An administrator moves a report between statuses such as **Pending**, **Under Review**, and **Resolved**.
+4. **Delete:** The student interface provides a delete action for filed reports.
+5. **Data relationship:** `incidents.user` refers to the reporting user's document.
+
+**3. Safety check-in management**
+
+1. **Create:** A student selects a destination, expected arrival time, and reminder interval.
+2. **Read:** The check-in dashboard displays existing journeys and their states.
+3. **Update:** Arrival confirmation or reminder processing changes check-in status and notification flags.
+4. **Delete:** The student can remove a check-in using the displayed Delete action.
+5. **Data relationship:** `checkins.user` refers to `users`; `checkinnotifications.checkIn` refers to `checkins`.
+
+**4. Emergency SOS and notifications**
+
+1. **Create:** Pressing **SEND SOS** records an alert with latitude and longitude.
+2. **Read:** Trusted recipients can view SOS notifications and access the shared location.
+3. **Notification records:** `sosnotifications` links a sender, receiver, and SOS record.
+4. **Scope:** SOS creation and notification retrieval are demonstrated; full update/delete behavior is not claimed.
+
+### Example data flow: Incident status update
+
+```mermaid
+flowchart LR
+    A[Student submits incident] --> B[Express API]
+    B --> C[(MongoDB incidents)]
+    C --> D[Admin dashboard reads reports]
+    D --> E[Admin changes status]
+    E --> B
+    B --> C
+    C --> F[Student views updated status]
+```
+
+## Technology Stack
+
+| Layer | Technologies |
 |---|---|
 | Frontend | React, Vite, React Router DOM, Axios |
 | Backend | Node.js, Express.js |
 | Database | MongoDB Atlas, Mongoose |
-| Authentication | JSON Web Tokens (JWT), bcryptjs |
-| AI Integration | Google Gemini API |
-| Background Tasks | Node Cron |
-| Middleware and Configuration | CORS, dotenv |
-| Version Control | Git, GitHub |
-| Frontend Deployment | Vercel |
-| Backend Deployment | Render |
+| Authentication | JWT, bcryptjs |
+| AI | Google Gemini API |
+| Background scheduling | Node Cron |
+| Configuration | dotenv, CORS |
+| Version control | Git, GitHub |
+| Deployment | Vercel (frontend), Render (backend configuration) |
 
----
 
-## 🏗 System Architecture
 
-CampusSafeHer follows a client-server architecture.
+### External packages and dependencies
 
-1. **Frontend:** The React application provides the user interface and sends API requests to the backend.
-2. **Backend:** The Node.js and Express.js server processes API requests, handles application logic, and manages authentication.
-3. **Database:** MongoDB Atlas stores user accounts, trusted contacts, incidents, SOS alerts, check-ins, and notifications.
-4. **AI Integration:** The backend integrates with the Google Gemini API to provide AI-powered functionality.
-5. **Deployment:** The frontend is deployed using Vercel, while the backend is intended to run on Render.
+Versions below are the **declared package.json ranges**, not necessarily the exact installed lockfile versions.
 
-### Architecture Diagram
+**Frontend — `frontend/package.json` (runtime dependencies)**
 
-![CampusSafeHer System Architecture](./CampusSafeHer_Architecture_Diagram.png)
+| Package | Declared version | Purpose |
+|---|---|---|
+| `axios` | `^1.17.0` | HTTP client |
+| `react` | `^19.2.6` | UI components |
+| `react-dom` | `^19.2.6` | React DOM rendering |
+| `react-router-dom` | `^7.17.0` | Client-side navigation |
 
-If your architecture image is stored in the `screenshots` folder instead, use:
+**Frontend — development dependencies**
 
-`./screenshots/Architectural%20diagram.png`
+| Package | Declared version | Purpose |
+|---|---|---|
+| `@eslint/js` | `^10.0.1` | ESLint JavaScript rules |
+| `@types/react` | `^19.2.14` | React type declarations |
+| `@types/react-dom` | `^19.2.3` | React DOM type declarations |
+| `@vitejs/plugin-react` | `^6.0.1` | React support in Vite |
+| `eslint` | `^10.3.0` | Code linting |
+| `eslint-plugin-react-hooks` | `^7.1.1` | React Hooks linting |
+| `eslint-plugin-react-refresh` | `^0.5.2` | Fast Refresh linting |
+| `globals` | `^17.6.0` | ESLint global definitions |
+| `vite` | `^8.0.12` | Development server and build tooling |
 
-Keep only the path that matches your actual repository.
+**Backend — `backend/package.json`**
 
----
+| Package | Declared version | Purpose |
+|---|---|---|
+| `@google/genai` | `^2.8.0` | Google Gemini AI SDK |
+| `bcryptjs` | `^3.0.3` | Password hashing |
+| `cors` | `^2.8.6` | Cross-origin resource sharing |
+| `dotenv` | `^17.4.2` | Environment variable loading |
+| `express` | `^5.2.1` | HTTP API and routing |
+| `jsonwebtoken` | `^9.0.3` | JWT creation and validation |
+| `mongoose` | `^9.7.0` | MongoDB models and queries |
+| `node-cron` | `^4.2.1` | Scheduled jobs |
 
-## 🗄 Database Design
+**External services**
 
-CampusSafeHer uses MongoDB Atlas with Mongoose for database management.
-
-The application contains seven main Mongoose models:
-
-| Model | Purpose |
+| Service | Role |
 |---|---|
-| `User` | Stores user account information and roles. |
-| `TrustedContact` | Associates users with their trusted contacts. |
-| `Incident` | Stores reported safety incidents. |
-| `SOS` | Stores emergency SOS alerts and geographical coordinates. |
-| `CheckIn` | Stores safety check-ins, arrival times, locations, and reminder status. |
-| `SOSNotification` | Stores notifications associated with SOS alerts. |
-| `CheckInNotification` | Stores notifications associated with safety check-ins. |
+| MongoDB Atlas | Hosted MongoDB database |
+| Google Gemini API | AI safety assistance |
+| Vercel | Frontend deployment |
+| Render | Backend deployment target |
 
-### Entity Relationship Diagram (ERD)
-
-The following diagram illustrates the relationships between the application's Mongoose models.
+## System Architecture
 
 ```mermaid
-erDiagram
-    USER ||--o{ TRUSTED_CONTACT : manages
-    USER ||--o{ TRUSTED_CONTACT : is_trusted_user
-    USER ||--o{ INCIDENT : reports
-    USER ||--o{ SOS : creates
-    USER ||--o{ CHECK_IN : schedules
-
-    USER ||--o{ SOS_NOTIFICATION : sends
-    USER ||--o{ SOS_NOTIFICATION : receives
-    SOS ||--o{ SOS_NOTIFICATION : generates
-
-    USER ||--o{ CHECK_IN_NOTIFICATION : sends
-    USER ||--o{ CHECK_IN_NOTIFICATION : receives
-    CHECK_IN ||--o{ CHECK_IN_NOTIFICATION : generates
-
-    USER {
-        ObjectId _id PK
-        String name
-        String email UK
-        String password
-        String role
-        Date createdAt
-        Date updatedAt
-    }
-
-    TRUSTED_CONTACT {
-        ObjectId _id PK
-        ObjectId user FK
-        ObjectId trustedUser FK
-        String relationship
-        Date createdAt
-        Date updatedAt
-    }
-
-    INCIDENT {
-        ObjectId _id PK
-        ObjectId user FK
-        String category
-        String description
-        String location
-        String status
-        Boolean isAnonymous
-        String attachment
-        String attachmentName
-        Date createdAt
-        Date updatedAt
-    }
-
-    SOS {
-        ObjectId _id PK
-        ObjectId user FK
-        Number latitude
-        Number longitude
-        String status
-        Date createdAt
-        Date updatedAt
-    }
-
-    CHECK_IN {
-        ObjectId _id PK
-        ObjectId user FK
-        String destination
-        Number currentLatitude
-        Number currentLongitude
-        Number lastKnownLatitude
-        Number lastKnownLongitude
-        Date expectedArrivalTime
-        Number reminderInterval
-        Boolean checkedIn
-        String status
-        Boolean reminder10Sent
-        Boolean reminder20Sent
-        Boolean alertSent
-        String alertMessage
-        Date createdAt
-        Date updatedAt
-    }
-
-    SOS_NOTIFICATION {
-        ObjectId _id PK
-        ObjectId sender FK
-        ObjectId receiver FK
-        ObjectId sos FK
-        Boolean isRead
-        Date createdAt
-        Date updatedAt
-    }
-
-    CHECK_IN_NOTIFICATION {
-        ObjectId _id PK
-        ObjectId sender FK
-        ObjectId receiver FK
-        ObjectId checkIn FK
-        String type
-        Date createdAt
-        Date updatedAt
-    }
+flowchart TD
+    U[Student / Administrator] --> F[React + Vite Frontend]
+    F -->|Axios / HTTP API| B[Node.js + Express Backend]
+    B -->|Mongoose| DB[(MongoDB Atlas)]
+    B -->|Safety assistant requests| AI[Google Gemini API]
+    B -->|Scheduled check-in checks| CRON[Node Cron]
 ```
 
-**Note:** `PK`, `FK`, and `UK` are explanatory labels in the diagram. MongoDB uses document identifiers and Mongoose references rather than relational-database foreign-key constraints.
+The frontend sends requests to the backend's `/api` routes. `server.js` enables JSON parsing, allows CORS requests from `http://localhost:5173` and `https://campus-safe-her.vercel.app`, connects to MongoDB, and starts the check-in monitor. The backend validates requests, handles authentication and safety workflows, and persists records in MongoDB Atlas.
 
-A static ERD image is also available in the `screenshots` folder:
 
-![CampusSafeHer ERD](./screenshots/CampusSafeHer_ERD.png)
 
----
+### Project folder and file architecture
 
-## 🖥 User Interface Screenshots
+This tree lists **verified uploaded backend route filenames** and the known project directories. Other subdirectories remain partially documented because a full repository tree was not supplied.
 
-The following screenshots demonstrate the main interfaces of CampusSafeHer.
+```text
+CampusSafeHer/
+├── README.md                         # GitHub documentation
+├── screenshots/                      # UI captures and MongoDB ERD
+│   └── CampusSafeHer_ERD.png         # Moon Modeler schema diagram
+├── frontend/                         # React + Vite application
+│   ├── package.json                  # Verified frontend dependencies
+│   └── src/                          # React pages/components (names unverified)
+└── backend/                          # Node.js + Express application
+    ├── package.json                  # Verified backend dependencies
+    ├── server.js                     # Express entry point; mounts /api routes and starts monitor
+    ├── routes/                        # Uploaded route modules
+    │   ├── authRoutes.js             # Registration, login, profile
+    │   ├── contactRoutes.js          # Trusted-contact CRUD routes
+    │   ├── incidentRoutes.js         # Student incident routes
+    │   ├── adminRoutes.js            # Administrator incident review
+    │   ├── checkInRoutes.js          # Check-ins and notifications
+    │   ├── sosRoutes.js              # SOS and notification routes
+    │   ├── aiRoutes.js               # Protected AI chat
+    │   └── healthRoutes.js           # API health check
+    ├── config/                       # db.js MongoDB connection module
+    ├── services/                     # checkInMonitor.js scheduled monitoring
+    ├── controllers/                  # Controller imports referenced in routes
+    └── middleware/                   # Authentication and admin middleware
+```
 
-> Ensure that each image filename matches the actual filename in your repository. Update or remove entries if your filenames differ.
+> `server.js` confirms the imported `config/db.js`, `services/checkInMonitor.js`, and eight route modules. The full frontend component tree still requires repository inspection. Never commit `.env` credentials or publish demo-account passwords.
 
-### Home Page
+## Database Design and ERD
 
-![CampusSafeHer Home Page](./screenshots/home.jpeg)
+The MongoDB database was reverse-engineered using **Moon Modeler**, producing a diagram of **7 collections and 11 references**. References are stored as MongoDB ObjectIds and resolved at the application level through Mongoose.
 
-### Login Page
+![CampusSafeHer MongoDB Database Schema](./screenshots/CampusSafeHer_ERD.png)
 
-![CampusSafeHer Login Page](./screenshots/Login.jpeg)
+| Collection | Key fields | Role |
+|---|---|---|
+| `users` | `name`, `email`, `password`, `role` | Registered accounts and roles |
+| `trustedcontacts` | `user`, `trustedUser`, `relationship` | Student-to-trusted-user relationships |
+| `incidents` | `user`, `category`, `description`, `location`, `status`, `isAnonymous`, `attachment` | Incident submissions and review |
+| `sos` | `user`, `latitude`, `longitude`, `status` | Emergency alert records |
+| `checkins` | `user`, `destination`, `expectedArrivalTime`, `reminderInterval`, `status`, location/reminder fields | Journey monitoring |
+| `sosnotifications` | `sender`, `receiver`, `sos`, `isRead` | SOS delivery records |
+| `checkinnotifications` | `sender`, `receiver`, `checkIn`, `type` | Overdue and safe-arrival notifications |
 
-### Registration Page
+**Principal relationships:** a user can create multiple incidents, SOS alerts, and check-ins; trusted-contact entries connect two users; notification documents reference their sender, receiver, and originating SOS/check-in record.
 
-![CampusSafeHer Registration Page](./screenshots/Register.jpeg)
 
-### Student Dashboard
 
-![CampusSafeHer Dashboard](./screenshots/Dashboard.jpeg)
+##  University Demo Accounts
 
-### Trusted Contacts
+CampusSafeHer provides separate **Student** and **Administrator** access flows for academic demonstration and testing. Account credentials are deliberately **not published in this public repository**.
 
-![CampusSafeHer Trusted Contacts](./screenshots/Contacts.jpeg)
+| Role | Demonstration scope | Credential availability |
+|---|---|---|
+| **Student** | Register/sign in; manage trusted contacts; send SOS; create check-ins; file and view incident reports; receive alerts; use AI assistant | Documented privately in the university project report |
+| **Administrator** | Sign in to the Incident Command Center; review, filter, and update incident statuses | Documented privately in the university project report |
 
-### Incident Reporting
+> **Security note:** Demo account emails, passwords, JWT secrets, MongoDB connection strings, and API keys are excluded from this README. Authorized university evaluators can refer to the accompanying project report or obtain test credentials privately. Avoid placing real passwords in any publicly shared version of the report.
 
-![CampusSafeHer Incident Reporting](./screenshots/Incidents.jpeg)
-
-### Safety Check-Ins
-
-![CampusSafeHer Check-Ins](./screenshots/Check-Ins.jpeg)
-
-### Emergency Alerts
-
-![CampusSafeHer Alerts](./screenshots/Alerts.jpeg)
-
-### AI Safety Assistant
-
-![CampusSafeHer AI Assistance](./screenshots/AI-Assistance.jpeg)
-
-### Administrative Dashboard
-
-![CampusSafeHer Admin Dashboard](./screenshots/Admin.jpeg)
-
----
-
-## ⚙ Installation and Setup
-
-Follow these instructions to run CampusSafeHer locally.
+## Installation and Local Setup
 
 ### Prerequisites
 
-Install the following software before starting:
-
 - Node.js and npm
 - Git
-- A MongoDB Atlas account or another compatible MongoDB deployment
-- A code editor such as Visual Studio Code
+- MongoDB Atlas database and database-user credentials
+- Google Gemini API key for AI functionality
 
-### 1. Clone the Repository
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/WaraniLakma/CampusSafeHer.git
 cd CampusSafeHer
 ```
 
-### 2. Set Up the Backend
-
-Navigate to the backend directory:
+### 2. Configure and run the backend
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file inside the `backend` directory and configure the required environment variables using the instructions below.
+Create `backend/.env`:
 
-Start the backend:
+```dotenv
+MONGODB_URI=your_mongodb_connection_string
+PORT=5000
+# Also configure the JWT secret and Gemini API key using
+# the exact environment-variable names referenced in the backend code.
+```
 
 ```bash
 npm start
 ```
 
-The backend uses port `5000` by default when the `PORT` environment variable is not configured.
+### 3. Configure and run the frontend
 
-### 3. Set Up the Frontend
-
-Open a second terminal from the project root and navigate to the frontend directory:
+In a **separate terminal** from the repository root:
 
 ```bash
 cd frontend
 npm install
 ```
-
-Create a `.env` file inside the `frontend` directory:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-Start the frontend development server:
-
-```bash
-npm run dev
-```
-
-Open the local address printed by Vite in your terminal. The default address is:
-
-`http://localhost:5173`
-
----
-
-## 🔐 Environment Variables
-
-### Backend Environment Variables
-
-Create `backend/.env` and configure the environment variables required by your backend.
-
-At minimum, the database configuration uses:
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-PORT=5000
-```
-
-Add the JWT secret and Google Gemini API key using the **exact variable names expected by your backend code**. Check the authentication and AI service files before adding them.
-
-Do not commit actual database credentials, API keys, or authentication secrets to GitHub.
-
-### Frontend Environment Variables
 
 Create `frontend/.env`:
 
-```env
+```dotenv
 VITE_API_URL=http://localhost:5000/api
 ```
 
-For a deployed frontend, configure `VITE_API_URL` with your deployed backend's API base URL, ending in `/api`.
-
----
-
-## ▶ Running the Application
-
-Start the backend and frontend in separate terminals.
-
-**Backend terminal:**
-
 ```bash
-cd backend
-npm start
-```
-
-**Frontend terminal:**
-
-```bash
-cd frontend
 npm run dev
 ```
 
-To build the frontend for production:
+Open the local URL shown by Vite (typically `http://localhost:5173`). To create a production frontend build, run `npm run build` from `frontend`.
 
-```bash
-cd frontend
-npm run build
-```
 
-The production build is generated by Vite in the frontend's `dist` directory.
+## Deployment
 
----
-
-## ☁ Deployment
-
-CampusSafeHer uses the following deployment approach:
-
-| Component | Platform |
+| Component | Service |
 |---|---|
 | Frontend | Vercel |
 | Backend | Render |
@@ -444,22 +377,61 @@ CampusSafeHer uses the following deployment approach:
 
 **Live frontend:** https://campus-safe-her.vercel.app
 
-For a successful deployment, configure the appropriate environment variables, ensure that the backend accepts requests from the deployed frontend origin, and verify that the backend can connect to MongoDB Atlas.
+When deploying, set `VITE_API_URL` to the public backend API URL, configure backend secrets securely, and allow the deployed frontend origin in backend CORS settings.
 
----
+## Application Screenshots
 
-## 🏆 Competition
+### Public pages and authentication
 
-CampusSafeHer was developed in connection with **DesignHer 2.0**, a workshop and competition for female undergraduate students of the Faculty of Engineering, University of Ruhuna.
+**Landing page**
 
-The project explores how full-stack web development and AI integration can contribute to improving student safety and emergency assistance.
+![CampusSafeHer landing page](./screenshots/home.jpeg)
 
----
+**Choose a portal**
 
-## 👩‍💻 Repository
+![Student and administrator portal selection](./screenshots/Role-Selection.jpeg)
 
-**GitHub Repository:** https://github.com/WaraniLakma/CampusSafeHer
+| Student sign-in | Student registration |
+|---|---|
+| ![Student login](./screenshots/User-Login.jpeg) | ![Student registration](./screenshots/User-Register.jpeg) |
 
----
+### Student safety dashboard
 
-*CampusSafeHer — Supporting safer journeys through technology.*
+![Student dashboard and SOS action](./screenshots/User-Dashboard.jpeg)
+
+### Trusted contact CRUD
+
+The trusted-circle screen supports adding registered users, viewing the saved circle, and removing contacts.
+
+![Trusted contact management](./screenshots/Contacts.jpeg)
+
+### Incident reporting and management
+
+Students can submit reports, see status changes, and access delete controls for their reports.
+
+![Incident reporting screen](./screenshots/Incidents.jpeg)
+
+### Journey safety check-ins
+
+The check-in interface displays destination entry, arrival timers, automatic overdue warnings, safe-arrival confirmation, and deletion controls.
+
+![Journey safety check-ins](./screenshots/Check-Ins.jpeg)
+
+### Safety notifications
+
+![SOS and check-in notifications](./screenshots/Alerts.jpeg)
+
+### AI safety assistant
+
+![AI-powered safety assistant](./screenshots/AI-Assistance.jpeg)
+
+### Administrator portal
+
+**Administrator sign-in**
+
+![Administrator login](./screenshots/Admin-Login.jpeg)
+
+**Incident command center — report reading, filtering, and status updates**
+
+![Administrator incident dashboard](./screenshots/Admin-Dashboard.jpeg)
+
