@@ -153,18 +153,21 @@ The system uses **MongoDB Atlas** for persistent storage and **Mongoose** to def
 3. **Notification records:** `sosnotifications` links a sender, receiver, and SOS record.
 4. **Scope:** SOS creation and notification retrieval are demonstrated; full update/delete behavior is not claimed.
 
+
+
 ### Example data flow: Incident status update
 
 ```mermaid
 flowchart LR
-    A[Student submits incident] --> B[Express API]
-    B --> C[(MongoDB incidents)]
-    C --> D[Admin dashboard reads reports]
-    D --> E[Admin changes status]
+    A["Student submits incident"] --> B["Express API"]
+    B --> C["MongoDB: incidents collection"]
+    C --> D["Admin dashboard reads reports"]
+    D --> E["Admin changes status"]
     E --> B
     B --> C
-    C --> F[Student views updated status]
+    C --> F["Student views updated status"]
 ```
+
 
 ## Technology Stack
 
